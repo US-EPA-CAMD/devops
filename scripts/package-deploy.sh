@@ -2,10 +2,10 @@
 
 cd $GITHUB_WORKSPACE
 
-echo "Retrieving keys ..."
+echo "Retrieving cloud.gov keys ..."
 cf api  https://api.fr.cloud.gov
 cf auth $1 $2
-cf target -o "epa-prototyping" -s "dev-easey-in"
+cf target -o "epa-easey" -s "dev"
 
 # S3_CREDENTIALS=`cf service-key "${SERVICE_INSTANCE_NAME}" "${KEY_NAME}" | tail -n +2`
 S3_CREDENTIALS=`cf service-key "deployment-artifacts" "deployment-artifacts-svc-key" | tail -n +2`
@@ -21,4 +21,3 @@ unzip -q $3.$4.$5.zip
 ls -l 
 cd $3/starter-kit
 cf push
-
