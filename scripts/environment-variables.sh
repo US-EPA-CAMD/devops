@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "CF_USERNAME=$CF_USERNAME"
+echo "CF_PASSWORD=$CF_PASSWORD"
+
 # GLOBAL
 echo "CF_API_URL=https://api.fr.cloud.gov" >> $GITHUB_ENV
 echo "CF_ORG_NAME=epa-easey" >> $GITHUB_ENV
