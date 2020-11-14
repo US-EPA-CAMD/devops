@@ -17,6 +17,6 @@ mkdir deployments
 aws s3 cp s3://$BUCKET_NAME/$3.$4.$5.zip deployments/
 cd deployments
 unzip -q $3.$4.$5.zip
-#ls -l 
+ls -l 
 #cd $3/starter-kit
-cf push
+#cf push
