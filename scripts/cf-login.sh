@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Initiating cloud.gov login... "
+cf api  $CF_API_URL
+
+echo ""
+cf auth
+
+echo ""
+echo "Setting cloud.gov target organization and space... "
+cf target -o $CF_ORG_NAME -s $CF_SPACE_NAME
