@@ -1,0 +1,40 @@
+name: Starter Kit CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # instructions on CF cli installation
+    # https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
+    - name: Install CF cli
+      run: |
+        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+        sudo apt-get update
+        sudo apt-get install cf-cli
+
+    - name: Build tasks-api
+      run: |
+        cd starter-kit/tasks-api
+        npm install
+        npm run build
+        cd ..
+  
+    # How to create a service account for automated deployments
+    # https://cloud.gov/docs/services/cloud-gov-service-account/
+    # https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+    - name: Deploy
+      run: |
+        cf api  https://api.fr.cloud.gov
+        cf auth ${{secrets.CF_SERVICE_ACCOUNT_ID}} ${{secrets.CF_SERVICE_ACCOUNT_PASSWORD}}
+        cf target -o "epa-prototyping" -s "dev-easey-in"
+        cd starter-kit
+        cf push

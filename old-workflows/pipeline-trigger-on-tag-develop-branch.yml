@@ -1,0 +1,53 @@
+name: Develop Branch Pipeline
+
+on:
+
+  pull_request:
+    branches: [ master ]
+  push:
+#    paths: [ "starter-kit/**" ]
+    branches: [ develop ]
+#    tags:
+#      - v[0-9]+.[0-9]+_rc[0-9]+
+
+jobs:
+  Build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install CF cli
+      run: |
+        starter-kit/scripts/install-pre-reqs.sh
+
+    - name: Build tasks-api
+      run: |
+        starter-kit/scripts/build.sh
+
+    - name: Unit Test
+      run: |
+        starter-kit/scripts/unitTests.sh
+
+    - name: Get Tag name if exists
+      run: |
+        echo "::set-env name=HEAD_TAG::$(git tag --points-at HEAD)"
+
+    - name: Package App
+      run: |
+        starter-kit/scripts/package.sh ${{secrets.CF_SERVICE_ACCOUNT_ID}} ${{secrets.CF_SERVICE_ACCOUNT_PASSWORD}}
+
+    - name: Deploy
+      run: |
+        starter-kit/scripts/deploy.sh ${{secrets.CF_SERVICE_ACCOUNT_ID}} ${{secrets.CF_SERVICE_ACCOUNT_PASSWORD}}
+#      if: env.HEAD_TAG != ''
+
+  Codescan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #SONAR_SCANNER_OPTS: -Xmx2048m
