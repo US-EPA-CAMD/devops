@@ -26,6 +26,11 @@ $ ./cf-ssh-tunnel.sh --organization $CF_ORG_NAME --space $CF_SPACE_NAME --host $
 ```
 NOTE: Replace $PARAMS with actual values or see the Environment Variables section regarding creating environment variables
 
+#### EXAMPLE
+```sh
+$ ./cf-ssh-tunnel.sh --organization epa-easey --space dev --host cg-aws-broker-prodg1t1yiwikl6s1rs.ci7nkegdizyy.us-gov-west-1.rds.amazonaws.com --application facilities-api --localPort 15210 --remotePort 5432
+```
+
 # Bind Service
 To bind an application to a service within cloud.gov run the following commands at a cmd prompt that is logged into cloud.gov...
 
