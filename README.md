@@ -30,22 +30,36 @@ NOTE: Replace $PARAMS with actual values or see the Environment Variables sectio
 To bind an application to a service within cloud.gov run the following commands at a cmd prompt that is logged into cloud.gov...
 
 #### Usage
-`cf bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [--binding-name BINDING_NAME]`
+```sh
+$ cf bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [--binding-name BINDING_NAME]
+```
 Optionally provide service-specific configuration parameters in a valid JSON object in-line:
-`cf bind-service APP_NAME SERVICE_INSTANCE -c '{"name":"value","name":"value"}'`
+```sh
+$ cf bind-service APP_NAME SERVICE_INSTANCE -c '{"name":"value","name":"value"}'
+```
 Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.
-`cf bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE`
+```sh
+$ cf bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE
+```
 Example of valid JSON object: { "permissions": "read-only" } Optionally provide a binding name for the association between an app and a service instance:
-`cf bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME`
+```sh
+$ cf bind-service APP_NAME SERVICE_INSTANCE --binding-name BINDING_NAME
+```
 
 #### EXAMPLES
 Linux/Mac:
-`cf bind-service myapp mydb -c '{"permissions":"read-only"}'`
+```sh
+$ cf bind-service myapp mydb -c '{"permissions":"read-only"}'
+```
 Windows Command Line:
-`cf bind-service myapp mydb -c "{\"permissions\":\"read-only\"}"`
+```sh
+$ cf bind-service myapp mydb -c "{\"permissions\":\"read-only\"}"
+```
 Windows PowerShell:
-`cf bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'`
-`cf bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --binding-name BINDING_NAME`
+```sh
+$ cf bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'`
+$ cf bind-service myapp mydb -c ~/workspace/tmp/instance_config.json --binding-name BINDING_NAME
+```
 
 # Github Runner Error
 The runner is trying to run your file as a script, but it looks like your file is missing the execute bit.
