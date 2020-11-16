@@ -1,4 +1,5 @@
-# Devops
+# DevOps
+[![GitHub](https://img.shields.io/github/license/US-EPA-CAMD/devops)](https://github.com/US-EPA-CAMD/devops/blob/master/LICENSE)<br>
 This repo stores common shared devops related files used by one or more repos within the US-EPA_CAMD organization
 
 ## Cloud Foundry CLI
@@ -84,10 +85,6 @@ $ git add --chmod=+x -- scripts/*
 $ git add --chmod=+x -- scripts/*.*
 ```
 And then push the changes back up.
-
-License
-----
-MIT
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. See http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
