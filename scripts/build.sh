@@ -1,5 +1,10 @@
 #!/bin/bash
 
-echo "Building... "
+echo "Installing dependencies..."
 npm install
-npm run build
+
+if [ $NESTJS_APP ]
+then
+  echo "Building..."
+  npm run build
+fi

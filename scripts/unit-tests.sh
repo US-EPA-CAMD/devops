@@ -1,8 +1,19 @@
 #!/bin/bash
 
-echo "Run Unit tests ... "
-npm install jest
-npm run test
+if [ $NESTJS_APP ]
+then
+  echo "Installing Jest framework..."
+  npm install jest
 
-#npm install react-scripts
-#CI=true npm test
+  echo "Running Unit tests... "
+  npm run test
+fi
+
+if [ $REACT_APP ]
+then
+  echo "Installing React scripts..."
+  npm install react-scripts
+
+  echo "Running Unit tests... "
+  CI=true npm test
+fi
