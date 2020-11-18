@@ -5,17 +5,21 @@ echo "Checking for tag..."
 # The following examples are valid TAG formats...
 # tst-1.0.101, stg-1.0.101, tstrbk-1.0.101, stgrbk-1.0.101
 tag=$(git tag --points-at HEAD)
+echo "tag: $tag"
 
 case $tag in
   (tst-[0-9]*.[0-9]*.[0-9]*)
     echo "CF_ORG_SPACE=test" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=test"
     ;;
   (stg-[0-9]*.[0-9]*.[0-9]*)
     echo "CF_ORG_SPACE=staging" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=staging"
     ;;
   # This is to match case of no tag for dev env as we do not want a malformed tag pushing to dev
   "")
     echo "CF_ORG_SPACE=dev" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=dev"
     ;;
   # if nothing matches we need to error and exit since the CF_ORG_SPACE is not properly set
   *)
@@ -23,3 +27,4 @@ case $tag in
     exit 1
     ;;
 esac
+

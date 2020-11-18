@@ -8,4 +8,4 @@ cf auth
 
 echo ""
 echo "Setting cloud.gov target organization and space... "
-cf target -o $CF_ORG_NAME -s $CF_SPACE_NAME
+cf target -o $CF_ORG_NAME -s $CF_ORG_SPACE
