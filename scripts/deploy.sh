@@ -14,4 +14,4 @@ then
 fi
 
 echo "Deploying package..."
-cf push
+cf push -f manifest.$CF_ORG_SPACE.yml
