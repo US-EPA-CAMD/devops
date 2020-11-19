@@ -5,9 +5,8 @@ then
   cd $GITHUB_WORKSPACE
 
   echo "Retrieving package from deployment artifacts..."
-  mkdir deployments
-  aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip deployments/
-  cd deployments
+  aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
+  cd $APP_NAME
   ls -l
 
   echo "Extracting package..."
