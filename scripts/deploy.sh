@@ -6,11 +6,13 @@ then
 
   echo "Retrieving package from deployment artifacts..."
   mkdir deployments
-  aws s3 cp s3://$ARTIFACTS_STORAGE/$APP.$VERSION.$GITHUB_RUN_NUMBER.zip deployments/
+  aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip deployments/
   cd deployments
+  ls -l
 
   echo "Extracting package..."
-  unzip -q $APP.$VERSION.$GITHUB_RUN_NUMBER.zip
+  unzip -q $PACKAGE.zip
+  ls -l  
 fi
 
 echo "Deploying package..."

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# APPLICATION
+echo "APP_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
+echo "APP_VERSION=$(grep sonar.projectVersion sonar-project.properties | cut -d'=' -f2)" >> $GITHUB_ENV
+
 # AWS GOV CLOUD
 echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
 
