@@ -4,7 +4,7 @@ echo "Retrieving tag..."
 tag=$(git tag --points-at HEAD)
 echo "Tag: $tag"
 
-if [ $tag != '' ]
+if [ "$tag" != "" ]
 then
   echo "Parsing tag version..."
   version=$(echo $tag | cut -d'-' -f2)
