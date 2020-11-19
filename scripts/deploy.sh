@@ -6,12 +6,10 @@ then
 
   echo "Retrieving package from deployment artifacts..."
   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
-  ls -l
 
   echo "Extracting package..."
   unzip -q $PACKAGE.zip
   cd $APP_NAME
-  ls -l
 fi
 
 echo "Deploying package..."
