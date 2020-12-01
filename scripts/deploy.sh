@@ -5,7 +5,16 @@ then
   cd $GITHUB_WORKSPACE
 
   echo "Retrieving package from deployment artifacts..."
-  aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
+  objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS  --key $PACKAGE.zip)
+  echo "---------"
+  echo $objectDetails
+  echo "---------"
+  if [[ -z $objectDetails ]]; then
+   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
+  else
+   echo "Error: Package doesnt exist on S3"
+   exit 1
+  fi
 
   echo "Extracting package..."
   unzip -q $PACKAGE.zip
