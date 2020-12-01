@@ -10,10 +10,11 @@ then
   echo $objectDetails
   echo "---------"
   if [[ -z $objectDetails ]]; then
-   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
-  else
-   echo "Error: Package doesnt exist on S3"
+   echo "Error: Package doesnt exist on S3 @ `date`"
+   echo "Exiting deployment stage @ `date`"
    exit 1
+  else
+   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
   fi
 
   echo "Extracting package..."
