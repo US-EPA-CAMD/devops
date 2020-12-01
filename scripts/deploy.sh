@@ -6,11 +6,9 @@ then
 
   echo "Retrieving package from deployment artifacts..."
   objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
-  echo "---------"
   echo $objectDetails
-  echo "---------"
   if [[ -z $objectDetails ]]; then
-   echo "Error: Package doesnt exist on S3 @ `date`"
+   echo "Error: Package \"$PACKAGE.zip\" doesnt exist on S3 @ `date`"
    echo "Exiting deployment stage @ `date`"
    exit 1
   else
