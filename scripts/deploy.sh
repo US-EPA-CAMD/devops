@@ -9,7 +9,7 @@ then
   echo $objectDetails
   if [[ -z $objectDetails ]]; then
    echo "Error: Package \"$PACKAGE.zip\" doesnt exist on S3 @ `date`"
-   echo "Exiting deployment stage @ `date`"
+   echo "Exiting deployment stage" 
    exit 1
   else
    aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
