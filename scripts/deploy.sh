@@ -5,7 +5,7 @@ then
   cd $GITHUB_WORKSPACE
 
   echo "Retrieving package from deployment artifacts..."
-  objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS  --key $PACKAGE.zip)
+  objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
   echo "---------"
   echo $objectDetails
   echo "---------"
