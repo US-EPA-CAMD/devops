@@ -18,6 +18,14 @@ case $tag in
     echo "CF_ORG_SPACE=test" >> $GITHUB_ENV
     echo "CF_ORG_SPACE=test"
     ;;
+  (rbk-tst-v[0-9]*.[0-9]*)
+    echo "CF_ORG_SPACE=test" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=test"
+    ;;
+  (rbk-stg-v[0-9]*.[0-9]*)
+    echo "CF_ORG_SPACE=staging" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=staging"
+    ;;
   (stg-v[0-9]*.[0-9]*)
     echo "CF_ORG_SPACE=staging" >> $GITHUB_ENV
     echo "CF_ORG_SPACE=staging"
