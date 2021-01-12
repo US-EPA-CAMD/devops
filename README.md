@@ -89,3 +89,7 @@ And then push the changes back up.
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. See http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
 [Cloud Foundry cli]: <https://docs.cloudfoundry.org/cf-cli/install-go-cli.html>
+
+## License & Contributing
+​
+This project is licensed under the MIT License. We encourage you to read this project’s [License](LICENSE), [Contributing Guidelines](CONTRIBUTING.md), and [Code of Conduct](CODE_OF_CONDUCT.md).
