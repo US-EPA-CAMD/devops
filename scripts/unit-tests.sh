@@ -16,4 +16,7 @@ then
 
   echo "Running Unit tests... "
   CI=true npm run test:cov
+  cat test-report.xml
+  cd coverage
+  cat lcov.info
 fi
