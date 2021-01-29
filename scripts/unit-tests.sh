@@ -15,5 +15,5 @@ then
   npm install react-scripts
 
   echo "Running Unit tests... "
-  CI=true npm test:cov
+  CI=true npm run test:cov
 fi
