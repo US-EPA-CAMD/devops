@@ -21,4 +21,9 @@ then
 fi
 
 echo "Deploying package..."
+echo "DEBUG: START"
+ls -l 
+pwd
+ls -l manifest-vars.$CF_ORG_SPACE.yml
+echo "DEBUG: END"
 cf push --vars-file manifest-vars.$CF_ORG_SPACE.yml
