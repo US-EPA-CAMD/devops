@@ -16,7 +16,6 @@ then
 
   echo "Running Unit tests... "
   CI=true npm run test:cov
-  cd coverage
-  sed -e 's|SF:'`pwd`'|SF:|' lcov.info
-  cat lcov.info
+  sed -e 's|SF:'`pwd`'|SF:|' covergae/lcov.info
+  cat coverage/lcov.info
 fi
