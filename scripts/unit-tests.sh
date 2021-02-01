@@ -16,5 +16,5 @@ then
 
   echo "Running Unit tests... "
   CI=true npm run test:cov
-  sed -i.bak 's|SF:'`pwd`'|SF:|' coverage/lcov.info
+  sed -i.bak 's|SF:'`pwd`'|SF:/github/workspace/|' coverage/lcov.info
 fi
