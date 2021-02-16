@@ -5,6 +5,7 @@ docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-api-scan.py -t 
 
 ls -ltr
 
+ls -ltr devops/
 
 # aws s3 cp report-$GITHUB_RUN_NUMBER.html s3://$ARTIFACTS_STORAGE/zap-scan-reports/
 # aws s3 ls s3://$ARTIFACTS_STORAGE/zap-scan-reports/
