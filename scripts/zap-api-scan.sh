@@ -18,7 +18,10 @@ docker volume ls
 pwd
 ls -ltr 
 
-ls -l /var/lib/docker
+sudo ls -l /var/lib
+
+
+sudo ls -l /var/lib/docker
 
 # find / -name zap.conf -print > /dev/null 2>&3
 
