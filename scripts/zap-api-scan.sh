@@ -18,9 +18,7 @@ docker volume ls
 pwd
 ls -ltr 
 
-echo "DEBUG: Physical dir listing"
-
-ls -ltr /docker/var/lib/docker/volumes/
+find / -name zap.conf -print
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
