@@ -10,14 +10,13 @@ cd devops/scripts/
 echo "DEBUG: List of all Volumes"
 lsblk
 
-# docker run -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
+docker run -t -v /var/run/docker.sock:/var/run/docker.sock owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
 
 echo "DEBUG: Files in Base directory"
 
 pwd
-ls -ltr /__w/
+ls -ltr 
 
-ls -ltr zap.conf
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
