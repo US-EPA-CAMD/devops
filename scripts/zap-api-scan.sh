@@ -7,7 +7,7 @@ cd devops/scripts/
 
 # docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -c api-zap-scan.conf -r report.html
 
-docker run -v /home/runner/work/easey-facilities-api/easey-facilities-api/devops/scripts:/zap/wrk/:rw -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
+docker run -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
 
 echo "DEBUG: Files in Base directory"
 
