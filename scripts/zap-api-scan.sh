@@ -18,7 +18,9 @@ docker volume ls
 pwd
 ls -ltr 
 
-find / -name zap.conf -print
+ls -l /var/lib/docker
+
+# find / -name zap.conf -print > /dev/null 2>&3
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
