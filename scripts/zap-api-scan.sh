@@ -7,10 +7,9 @@ cd devops/scripts/
 
 # docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -c api-zap-scan.conf -r report.html
 
-echo "DEBUG: List of all Volumes"
-lsblk
+docker run --name dv_git_workspace -v /zap/wrk gliderlabs/alpine:latest /bin/true
 
-docker run -t -v /var/run/docker.sock:/var/run/docker.sock owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
+docker run -t --volumes-from dv_git_workspace -v /var/run/docker.sock:/var/run/docker.sock owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
 
 echo "DEBUG: Files in Base directory"
 
