@@ -12,7 +12,7 @@ docker run -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.c
 echo "DEBUG: Files in Base directory"
 
 pwd
-ls -ltr
+ls -ltr /_W/
 
 ls -ltr zap.conf
 
