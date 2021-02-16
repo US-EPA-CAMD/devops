@@ -8,6 +8,7 @@ cd devops/scripts/
 # docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -c api-zap-scan.conf -r report.html
 
 sudo mkdir /zap/wrk
+sudo chmod 777 /zap/wrk
 
 sudo docker run --name dv_git_workspace -v /zap/wrk gliderlabs/alpine:latest /bin/true
 
