@@ -9,7 +9,7 @@ cd devops/scripts/
 
 docker run --name dv_git_workspace -v /zap/wrk gliderlabs/alpine:latest /bin/true
 
-docker run -t --volumes-from dv_git_workspace -v /var/run/docker.sock:/var/run/docker.sock owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi  -g zap.conf
+docker run -t --volumes-from dv_git_workspace -v /var/run/docker.sock:/var/run/docker.sock owasp/zap2docker-stable zap-api-scan.py -t https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger -f openapi -d  -g zap.conf
 
 echo "DEBUG: Files in Base directory"
 
@@ -22,8 +22,7 @@ sudo ls -lR /var/lib/docker/volumes/$volumeName
 
 sudo find /var/lib/docker/volumes/$volumeName/ -name zap.conf -print
 
-
-# find / -name zap.conf -print > /dev/null 2>&3
+sudo find /var/lib -name zap.conf -print 
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
