@@ -13,9 +13,14 @@ docker run -t --volumes-from dv_git_workspace -v /var/run/docker.sock:/var/run/d
 
 echo "DEBUG: Files in Base directory"
 
+docker volume ls
+
 pwd
 ls -ltr 
 
+echo "DEBUG: Physical dir listing"
+
+ls -ltr /docker/var/lib/docker/volumes/
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
