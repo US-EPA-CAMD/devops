@@ -18,7 +18,9 @@ docker volume ls
 volumeName=$(docker volume ls --format "{{.Name}}")
 
 
-sudo ls -l /var/lib/docker/volumes/$volumeName/
+sudo ls -l /var/lib/docker/volumes/$volumeName/_data/
+
+sudo find /var/lib/docker/volumes/$volumeName/_data/ -name zap.conf -print
 
 
 # find / -name zap.conf -print > /dev/null 2>&3
