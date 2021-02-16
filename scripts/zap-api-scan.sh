@@ -15,13 +15,7 @@ echo "DEBUG: Files in Base directory"
 
 docker volume ls
 
-pwd
-ls -ltr 
-
-sudo ls -l /var/lib
-
-
-sudo ls -l /var/lib/docker
+sudo ls -l /var/lib/docker/volumes/
 
 # find / -name zap.conf -print > /dev/null 2>&3
 
