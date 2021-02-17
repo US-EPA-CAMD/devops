@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    - cron: '23 3 * * 2'
+    - cron: '45 * * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
@@ -17,7 +17,7 @@ jobs:
           ref: master
       - name: Configure Env Vars
         run: scripts/environment-variables.sh          
-      - name: ZAP Scan 01
+      - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -26,7 +26,7 @@ jobs:
           target: 'https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
-        run: scripts/zap-api-scan.sh
+        run: scripts/zap-api-scan.sh Facilities-Management
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
