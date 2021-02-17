@@ -1,9 +1,5 @@
 name: "Emissions Management ZAP Scan"
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
   schedule:
     - cron: '45 1 * * *'
 jobs:
