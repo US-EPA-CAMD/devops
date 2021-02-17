@@ -2,6 +2,8 @@
 
 cd $GITHUB_WORKSPACE
 
+ls -ltR
+
 # cp devops/api-zap-scan.conf devops/scripts/
 # cd devops/scripts/
 
