@@ -1,8 +1,16 @@
 #!/bin/bash
 
 cd $GITHUB_WORKSPACE
-aws s3 ls s3://$ARTIFACTS_STORAGE/
-aws s3 cp report_html.html s3://$ARTIFACTS_STORAGE/zap-scan-reports/
+DATE=$(date +"%m-%d-%Y.%H:%M:%S")
+zip zapscan-$GITHUB_RUN_NUMBER-$DATE.zip report_html.html report_json.json report_md.md
+
+aws s3 cp zapscan-$GITHUB_RUN_NUMBER-$DATE.zip s3://$ARTIFACTS_STORAGE/zap-scan-reports/
+aws s3 ls s3://$ARTIFACTS_STORAGE/zap-scan-reports/
+
+
+
+
+
 
 # cp devops/api-zap-scan.conf devops/scripts/
 # cd devops/scripts/
