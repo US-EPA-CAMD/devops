@@ -1,7 +1,7 @@
 name: "Emissions Management ZAP Scan"
 on:
   schedule:
-    - cron: '45 1 * * *'
+    - cron: '15 * * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
