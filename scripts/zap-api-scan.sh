@@ -1,8 +1,8 @@
 #!/bin/bash
 
 cd $GITHUB_WORKSPACE
-
-ls -ltR
+aws s3 ls s3://$ARTIFACTS_STORAGE/
+aws s3 cp report_html.html s3://$ARTIFACTS_STORAGE/zap-scan-reports/
 
 # cp devops/api-zap-scan.conf devops/scripts/
 # cd devops/scripts/
@@ -27,7 +27,7 @@ echo "DEBUG: Files in Base directory"
 
 # sudo find /var/lib/docker/volumes/$volumeName/ -name zap.conf -print
 
-sudo find $GITHUB_WORKSPACE  -name zap-api-scan.conf -print 
+# sudo find $GITHUB_WORKSPACE  -name zap-api-scan.conf -print 
 
 
 # aws s3 ls s3://$ARTIFACTS_STORAGE/
