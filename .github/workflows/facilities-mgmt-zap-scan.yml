@@ -1,11 +1,11 @@
-name: "ZAP Scan"
+name: "Facilities Management ZAP Scan"
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
   schedule:
-    - cron: '45 * * * *'
+    - cron: '45 2 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
