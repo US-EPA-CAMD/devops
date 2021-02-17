@@ -22,18 +22,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
+          issue_title: 'OWASP Scan - Facilities Management'
           target: 'https://easey-dev.app.cloud.gov/api/facility-mgmt/swagger'
           cmd_options: '-a -c rules.tsv'
-      - name: Package the reports
+      - name: Package reports
         run: scripts/zap-api-scan.sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
-      - name: ZAP Scan 02
-        uses: zaproxy/action-full-scan@v0.2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          docker_name: 'owasp/zap2docker-stable'
-          target: 'https://easey-dev.app.cloud.gov/api/monitor-plan-mgmt/swagger'
-          cmd_options: '-a -c rules.tsv'
+
           
