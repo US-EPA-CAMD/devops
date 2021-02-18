@@ -1,7 +1,7 @@
 name: "Master Data Management ZAP Scan"
 on:
   schedule:
-    - cron: '45 * * * *'
+    - cron: '45 3 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 name: "Monitor Plan ZAP Scan"
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 4 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest

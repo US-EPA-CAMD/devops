@@ -1,7 +1,7 @@
 name: "Facilities Management ZAP Scan"
 on:
   schedule:
-    - cron: '30 * * * *'
+    - cron: '30 2 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
