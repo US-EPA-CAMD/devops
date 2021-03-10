@@ -33,7 +33,7 @@ then
   yq m -x manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
 fi
 
-echo "Using values from merged manifest-vars.yml..."
+echo "Using values from manifest-vars.yml..."
 echo "{"
 cat manifest-vars.yml
 echo "}"
@@ -45,10 +45,11 @@ else
   PREFIX=""
 fi
 
+APP_NAME="${APP_NAME/-/_}"
 VERSION_VAR_NAME="${PREFIX}EASEY_${APP_NAME^^}_VERSION"
 VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
 PUBLISHED_VAR_NAME="${PREFIX}EASEY_${APP_NAME^^}_PUBLISHED"
-PUBLISHED_VAR_VALUE=date +'%a %b %d %Y'
+PUBLISHED_VAR_VALUE=$(date +'%a %b %d %Y')
 
 echo "Setting version environment variable..."
 echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
