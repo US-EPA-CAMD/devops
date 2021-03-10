@@ -7,12 +7,14 @@ then
   echo "Retrieving package from deployment artifacts..."
   objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
   echo $objectDetails
-  if [[ -z $objectDetails ]]; then
-   echo "Error: Package \"$PACKAGE.zip\" doesn't exist in the deployment artifacts @  `date`"
-   echo "Exiting deployment stage" 
-   exit 1
+
+  if [[ -z $objectDetails ]];
+  then
+    echo "Error: Package \"$PACKAGE.zip\" doesn't exist in the deployment artifacts @  `date`"
+    echo "Exiting deployment stage" 
+    exit 1
   else
-   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
+    aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
   fi
 
   echo "Extracting package..."
@@ -20,10 +22,41 @@ then
   cd $APP_NAME
 fi
 
+if [ "$CF_ORG_SPACE" != "dev" ]
+then
+  echo "Installing yq YAML parser..."
+  sudo add-apt-repository ppa:rmescandon/yq
+  sudo apt update
+  sudo apt install yq -y
+
+  echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
+  yq m -x manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
+fi
+
+echo "Using values from merged manifest-vars.yml..."
+echo "{"
+cat manifest-vars.yml
+echo "}"
+
+if [ $REACT_APP ]
+then
+  PREFIX="REACT_APP_"
+else
+  PREFIX=""
+fi
+
+VERSION_VAR_NAME="${PREFIX}EASEY_${APP_NAME^^}_VERSION"
+VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
+PUBLISHED_VAR_NAME="${PREFIX}EASEY_${APP_NAME^^}_PUBLISHED"
+PUBLISHED_VAR_VALUE=date +'%a %b %d %Y'
+
+echo "Setting version environment variable..."
+echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
+cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE
+
+echo "Setting published environment variable..."
+echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
+cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE
+
 echo "Deploying package..."
-echo "DEBUG: START"
-ls -l 
-pwd
-ls -l manifest-vars.$CF_ORG_SPACE.yml
-echo "DEBUG: END"
-cf push --vars-file manifest-vars.$CF_ORG_SPACE.yml
+cf push --vars-file manifest-vars.yml
