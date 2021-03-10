@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # APPLICATION
-echo "APP_NAME=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs" >> $GITHUB_ENV
+echo "APP_NAME=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs)" >> $GITHUB_ENV
 echo "APP_VERSION=$(grep sonar.projectVersion sonar-project.properties | cut -d'=' -f2)" >> $GITHUB_ENV
 
 # AWS GOV CLOUD
