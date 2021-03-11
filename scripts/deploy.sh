@@ -39,7 +39,7 @@ echo "Using values from manifest-vars.yml..."
 echo "{"
 cat manifest-vars.yml
 echo ""
-echo "{"
+echo "}"
 echo ""
 
 PREFIX="${APP_NAME/-/_}"
@@ -54,16 +54,16 @@ echo "Setting environment variables..."
 VERSION_VAR_NAME="${PREFIX}_VERSION"
 VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
 
-#echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
 echo "cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE"
 cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE
 
 PUBLISHED_VAR_NAME="${PREFIX}_PUBLISHED"
 PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 
-#echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
+echo ""
 echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME "$PUBLISHED_VAR_VALUE"
 
+echo ""
 echo "Deploying package..."
 cf push --vars-file manifest-vars.yml
