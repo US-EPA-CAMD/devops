@@ -34,10 +34,14 @@ then
 fi
 
 echo "Using values from manifest-vars.yml..."
+echo "{"
 cat manifest-vars.yml
+echo ""
+echo "{"
+echo ""
 
 PREFIX="${APP_NAME/-/_}"
-PREFIX="EASEY_${APP_NAME^^}"
+PREFIX="EASEY_${PREFIX^^}"
 
 if [ $REACT_APP ]
 then
@@ -47,7 +51,7 @@ fi
 VERSION_VAR_NAME="${PREFIX}_VERSION"
 VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
 PUBLISHED_VAR_NAME="${PREFIX}_PUBLISHED"
-PUBLISHED_VAR_VALUE=$(date +'%a %b %d %Y')
+PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 
 echo "Setting version environment variable..."
 echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
