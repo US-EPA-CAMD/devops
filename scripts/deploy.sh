@@ -48,17 +48,19 @@ then
   PREFIX="REACT_APP_${PREFIX}"
 fi
 
+echo "Setting environment variables..."
 VERSION_VAR_NAME="${PREFIX}_VERSION"
 VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
+
+#echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
+echo "cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE"
+cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE
+
 PUBLISHED_VAR_NAME="${PREFIX}_PUBLISHED"
 PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 
-echo "Setting version environment variable..."
-echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
-cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE
-
-echo "Setting published environment variable..."
-echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
+#echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
+echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE
 
 echo "Deploying package..."
