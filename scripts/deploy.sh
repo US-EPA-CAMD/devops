@@ -60,8 +60,8 @@ PUBLISHED_VAR_NAME="${PREFIX}_PUBLISHED"
 PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 
 #echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
-echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
-cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE
+echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME '$PUBLISHED_VAR_VALUE'"
+cf set-env $APP_NAME $PUBLISHED_VAR_NAME '$PUBLISHED_VAR_VALUE'
 
 echo "Deploying package..."
 cf push --vars-file manifest-vars.yml
