@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "REACT_APP=$REACT_APP" >> $GITHUB_ENV
+echo "NESTJS_APP=$NESTJS_APP" >> $GITHUB_ENV
+echo "DEPLOY_FROM_ARTIFACT=$DEPLOY_FROM_ARTIFACT" >> $GITHUB_ENV
+
 # APPLICATION
 echo "APP_NAME=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs)" >> $GITHUB_ENV
 echo "APP_VERSION=$(grep sonar.projectVersion sonar-project.properties | cut -d'=' -f2)" >> $GITHUB_ENV
