@@ -22,13 +22,18 @@ then
   cd $APP_NAME
 fi
 
-echo "Installing yq YAML parser..."
-sudo add-apt-repository ppa:rmescandon/yq
-sudo apt update
-sudo apt install yq -y
+if [ "$CF_ORG_SPACE" != "dev" ]
+then
+  echo "Installing yq YAML parser..."
+  sudo add-apt-repository ppa:rmescandon/yq
+  sudo apt update
+  sudo apt install yq -y
 
-echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
-yq m -x manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
+  echo ""
+  echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
+  yq m -x manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
+  echo ""  
+fi
 
 echo "Using values from manifest-vars.yml..."
 echo "{"
@@ -49,12 +54,14 @@ echo "Setting environment variables..."
 VERSION_VAR_NAME="${PREFIX}_VERSION"
 VERSION_VAR_VALUE="$APP_VERSION.$GITHUB_RUN_NUMBER"
 
+#echo "${VERSION_VAR_NAME}=${VERSION_VAR_VALUE}"
 echo "cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE"
 cf set-env $APP_NAME $VERSION_VAR_NAME $VERSION_VAR_VALUE
 
 PUBLISHED_VAR_NAME="${PREFIX}_PUBLISHED"
 PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 
+#echo "${PUBLISHED_VAR_NAME}=${PUBLISHED_VAR_VALUE}"
 echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME "$PUBLISHED_VAR_VALUE"
 
