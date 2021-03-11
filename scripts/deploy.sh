@@ -41,7 +41,7 @@ cat manifest-vars.yml
 echo "}"
 echo ""
 
-PREFIX="${APP_NAME/-/_}"
+PREFIX="${APP_NAME//-/_}"
 PREFIX="EASEY_${PREFIX^^}"
 
 if [ $REACT_APP ]
