@@ -1,8 +1,19 @@
 #!/bin/bash
 
-echo "REACT_APP=$REACT_APP" >> $GITHUB_ENV
-echo "NESTJS_APP=$NESTJS_APP" >> $GITHUB_ENV
-echo "DEPLOY_FROM_ARTIFACT=$DEPLOY_FROM_ARTIFACT" >> $GITHUB_ENV
+if [ $REACT_APP ]
+then
+  echo "REACT_APP=true" >> $GITHUB_ENV
+fi
+
+if [ $NESTJS_APP ]
+then
+  echo "NESTJS_APP=true" >> $GITHUB_ENV
+fi
+
+if [ $DEPLOY_FROM_ARTIFACT ]
+then
+  echo "DEPLOY_FROM_ARTIFACT=true" >> $GITHUB_ENV
+fi
 
 # APPLICATION
 echo "APP_NAME=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs)" >> $GITHUB_ENV
