@@ -38,7 +38,6 @@ fi
 echo "Using values from manifest-vars.yml..."
 echo "{"
 cat manifest-vars.yml
-echo ""
 echo "}"
 echo ""
 
