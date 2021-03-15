@@ -25,7 +25,7 @@ NR > 1{
 }
 END {
 }
-' devops/scripts/approved_licenses.csv)
+' devops/approved_licenses.csv)
 
 echo -e "\033[32mApproved licenses:\033[0m $approved \n"
 
