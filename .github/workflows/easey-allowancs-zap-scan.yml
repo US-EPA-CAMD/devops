@@ -1,9 +1,7 @@
 name: "Easey Allowance ZAP Scan"
 on:
   push:
-    branches: [ master/* ]
-  schedule:
-    - cron: '30 4 * * *'
+    branches: [ master ]
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
