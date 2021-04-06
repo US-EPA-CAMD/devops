@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'OWASP Scan - Easey Allowance API'
-          target: 'https://github.com/US-EPA-CAMD/easey-allowance-api'
+          target: 'https://easey-dev.app.cloud.gov/api/allowance-mgmt/SWAGGER'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
         run: scripts/zap-api-scan.sh Easey-Allowance-API
