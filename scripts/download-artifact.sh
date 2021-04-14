@@ -1,8 +1,11 @@
 #!/bin/bash
 
 cd $GITHUB_WORKSPACE
+ls -h
+
+echo "backup 1 level..."
 cd ..
-ls -l
+ls -h
 
 echo "Retrieving package from deployment artifacts..."
 objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
@@ -17,7 +20,9 @@ else
   aws s3 cp s3://$ARTIFACTS_STORAGE/$PACKAGE.zip .
 fi
 
+ls -h
+
 echo "Extracting package..."
-unzip -q $PACKAGE.zip
-cd "easey-facilities-api"
-ls -l
+unzip -q -o -u $PACKAGE.zip
+cd $GITHUB_REPOSITORY
+ls -h
