@@ -17,5 +17,5 @@ fi
 
 echo "Extracting package..."
 unzip -q $PACKAGE.zip
+cd "easey-facilities-api"
 ls -l
-cd $APP_NAME
