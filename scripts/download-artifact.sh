@@ -17,4 +17,5 @@ fi
 
 echo "Extracting package..."
 unzip -q $PACKAGE.zip
+ls -l
 cd $APP_NAME
