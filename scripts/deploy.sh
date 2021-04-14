@@ -35,12 +35,6 @@ then
   echo ""  
 fi
 
-echo "Using values from manifest-vars.yml..."
-echo "{"
-cat manifest-vars.yml
-echo "}"
-echo ""
-
 PREFIX="${APP_NAME//-/_}"
 PREFIX="EASEY_${PREFIX^^}"
 
@@ -62,10 +56,6 @@ PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 echo ""
 echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME "$PUBLISHED_VAR_VALUE"
-
-echo ""
-echo "Package contents..."
-ls -l
 
 echo ""
 echo "Deploying package..."
