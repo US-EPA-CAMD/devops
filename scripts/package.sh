@@ -10,7 +10,7 @@ echo ""
 
 echo "Building Artifact: $APP_NAME.$APP_VERSION.$GITHUB_RUN_NUMBER.zip"
 cd ../
-zip -q -r $APP_NAME.$APP_VERSION.$GITHUB_RUN_NUMBER.zip `basename $GITHUB_WORKSPACE` -x */\.* *.git* \.* *.md *Docker* *docker* *manifest* LICENSE /node_modules/* /test/*
+zip -q -r $APP_NAME.$APP_VERSION.$GITHUB_RUN_NUMBER.zip `basename $GITHUB_WORKSPACE` -x */\.* *.git* \.* *.md *Docker* *docker* LICENSE /node_modules/* /test/*
 ls -l $APP_NAME.$APP_VERSION.$GITHUB_RUN_NUMBER.zip
 echo ""
 
