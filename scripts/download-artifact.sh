@@ -1,6 +1,8 @@
 #!/bin/bash
 
 cd $GITHUB_WORKSPACE
+cd ..
+ls -l
 
 echo "Retrieving package from deployment artifacts..."
 objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
