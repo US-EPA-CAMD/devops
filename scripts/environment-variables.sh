@@ -19,7 +19,6 @@ then
   echo "PACKAGE=$APP_NAME.$version" >> $GITHUB_ENV
   echo "App Version: $version"
   echo ""
-fi
 else
   echo "Tag not provided will retrieve version from project properties..."
   version=$(grep sonar.projectVersion sonar-project.properties | cut -d'=' -f2)
