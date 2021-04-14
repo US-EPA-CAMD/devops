@@ -1,0 +1,30 @@
+name: "Easey Allowance ZAP Scan"
+on:
+  push:
+    branches: [ master ]
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+    name: Easey Allowance API
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Configure Env Vars
+        run: scripts/environment-variables.sh          
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'owasp/zap2docker-stable'
+          issue_title: 'OWASP Scan - Easey Allowance API'
+          target: 'https://easey-dev.app.cloud.gov/api/allowance-mgmt/SWAGGER'
+          cmd_options: '-a -c rules.tsv'
+      - name: Package reports
+        run: scripts/zap-api-scan.sh Easey-Allowance-API
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
+
+          
