@@ -18,6 +18,6 @@ fi
 
 echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
-cd "$GITHUB_REPOSITORY"
+cd "easey-$APP_NAME"
 cd "dist"
 ls -l
