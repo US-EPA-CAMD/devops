@@ -1,11 +1,15 @@
 #!/bin/bash
 
 echo "Initialing & Configuring environment..."
-echo "ENV_VAR_PREFIX=$ENV_VAR_PREFIX" >> $GITHUB_ENV
+echo ""
+
 name=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs)
 echo "APP_NAME=$name" >> $GITHUB_ENV
-echo "APP_NAME=$name"
-echo ""
+echo "ENV_VAR_PREFIX=$ENV_VAR_PREFIX" >> $GITHUB_ENV
+echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
+echo "CF_API_URL=https://api.fr.cloud.gov" >> $GITHUB_ENV
+echo "CF_ORG_NAME=epa-easey" >> $GITHUB_ENV
+echo "ARTIFACTS_STORAGE=cg-85627a9c-7d48-446a-8cb7-5daa5c694169" >> $GITHUB_ENV
 
 echo "Retrieving tag & version..."
 tag=$(git tag --points-at HEAD)
@@ -16,7 +20,6 @@ then
   echo ""
   version=$(echo $tag | cut -d'-' -f2)
   echo "APP_VERSION=$version" >> $GITHUB_ENV
-  echo "PACKAGE=$APP_NAME.$version" >> $GITHUB_ENV
   echo "App Version: $version"
   echo ""
 else
@@ -27,6 +30,8 @@ else
   echo "App Version: $version"
   echo ""
 fi
+
+echo "PACKAGE=$APP_NAME.$version" >> $GITHUB_ENV
 
 case $tag in
   (tst-v[0-9]*.[0-9]*)
@@ -56,13 +61,3 @@ case $tag in
     exit 1
     ;;
 esac
-
-# AWS GOV CLOUD
-echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
-
-# CLOUD.GOV
-echo "CF_API_URL=https://api.fr.cloud.gov" >> $GITHUB_ENV
-echo "CF_ORG_NAME=epa-easey" >> $GITHUB_ENV
-
-# AWS S3 ARTIFACTS STORAGE
-echo "ARTIFACTS_STORAGE=cg-85627a9c-7d48-446a-8cb7-5daa5c694169" >> $GITHUB_ENV
