@@ -31,7 +31,7 @@ else
   echo ""
 fi
 
-echo "PACKAGE=$APP_NAME.$version" >> $GITHUB_ENV
+echo "PACKAGE=$name.$version" >> $GITHUB_ENV
 
 case $tag in
   (tst-v[0-9]*.[0-9]*)
