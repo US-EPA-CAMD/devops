@@ -30,5 +30,9 @@ echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME "$PUBLISHED_VAR_VALUE"
 
 echo ""
+echo "Contents of package..."
+ls -la
+
+echo ""
 echo "Deploying package..."
 cf push --vars-file manifest-vars.yml
