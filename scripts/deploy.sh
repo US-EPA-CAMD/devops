@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# if [[ $(cf app $APP_NAME) == *"FAILED"* ]]
+# then
+#   echo "$APP_NAME application does not exist! Creating application..."
+#   cf create-app $APP_NAME
+# fi
+
 if [ "$CF_ORG_SPACE" != "dev" ]
 then
   echo "Installing yq YAML parser..."
@@ -28,10 +34,6 @@ PUBLISHED_VAR_VALUE=$(TZ='America/New_York' date +'%a %b %d %Y')
 echo ""
 echo "cf set-env $APP_NAME $PUBLISHED_VAR_NAME $PUBLISHED_VAR_VALUE"
 cf set-env $APP_NAME $PUBLISHED_VAR_NAME "$PUBLISHED_VAR_VALUE"
-
-echo ""
-echo "Contents of package..."
-ls -la
 
 echo ""
 echo "Deploying package..."
