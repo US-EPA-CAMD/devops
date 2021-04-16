@@ -4,4 +4,4 @@ echo "Installing dependencies..."
 npm install
 
 echo "Building..."
-npm run build
+CI=false npm run build
