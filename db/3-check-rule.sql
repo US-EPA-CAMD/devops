@@ -4,12 +4,12 @@
 
 CREATE TABLE camdecmpsaux.check_rule
 (
-    check_rule_id character varying(45) COLLATE pg_catalog."default" NOT NULL,
-    check_rule_cd character varying(15) COLLATE pg_catalog."default" NOT NULL,
-    check_rule_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    check_rule_description character varying(1000) COLLATE pg_catalog."default" NOT NULL,
-    check_rule_type_cd character varying(10) COLLATE pg_catalog."default" NOT NULL,
-    check_rule_category_cd character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    check_rule_id uuid NOT NULL,
+    check_rule_cd character varying NOT NULL,
+    check_rule_name character varying NOT NULL,
+    check_rule_description character varying NOT NULL,
+    check_rule_type_cd character varying NOT NULL,
+    check_rule_category_cd character varying NOT NULL,
     check_rule_priority NUMERIC NOT NULL,
     check_rule_xml character varying,
     check_rule_json character varying,
@@ -20,13 +20,11 @@ CREATE TABLE camdecmpsaux.check_rule
 --    update_date date,
     CONSTRAINT pk_check_rule PRIMARY KEY (check_rule_id),
     CONSTRAINT uq_check_rule_code UNIQUE (check_rule_cd),
-    CONSTRAINT fk_check_rule_type_code FOREIGN KEY (check_rule_type_cd)
-        REFERENCES camdecmpsmd.check_rule_type_code (check_rule_type_cd) MATCH SIMPLE,
-    CONSTRAINT fk_check_rule_category_code FOREIGN KEY (check_rule_category_cd)
-        REFERENCES camdecmpsmd.check_rule_category_code (check_rule_category_cd) MATCH SIMPLE
-)
-
-TABLESPACE pg_default;
+    CONSTRAINT fk_check_rule_type FOREIGN KEY (check_rule_type_cd)
+        REFERENCES camdecmpsaux.check_rule_type (check_rule_type_cd) MATCH SIMPLE,
+    CONSTRAINT fk_check_rule_category FOREIGN KEY (check_rule_category_cd)
+        REFERENCES camdecmpsaux.check_rule_category (check_rule_category_cd) MATCH SIMPLE
+);
 
 COMMENT ON TABLE camdecmpsaux.check_rule
     IS 'Rules used by the check engine business rule evaluation processes.';
@@ -73,20 +71,18 @@ COMMENT ON COLUMN camdecmpsaux.check_rule.is_active
 -- COMMENT ON COLUMN camdecmpsaux.check_rule.update_date
 --     IS 'Date and time in which record was last updated. ';
 
--- Index: idx_check_rule_type_code
+-- Index: idx_check_rule_type
 
--- DROP INDEX camdecmpsaux.idx_check_rule_type_code;
+-- DROP INDEX camdecmpsaux.idx_check_rule_type;
 
-CREATE INDEX idx_check_rule_type_code
+CREATE INDEX idx_check_rule_type
     ON camdecmpsaux.check_rule USING btree
-    (check_rule_type_cd COLLATE pg_catalog."default" ASC NULLS LAST)
-    TABLESPACE pg_default;
+    (check_rule_type_cd ASC NULLS LAST);
 
--- Index: idx_check_rule_category_code
+-- Index: idx_check_rule_category
 
--- DROP INDEX camdecmpsaux.idx_check_rule_category_code;
+-- DROP INDEX camdecmpsaux.idx_check_rule_category;
 
-CREATE INDEX idx_check_rule_category_code
+CREATE INDEX idx_check_rule_category
     ON camdecmpsaux.check_rule USING btree
-    (check_rule_category_cd COLLATE pg_catalog."default" ASC NULLS LAST)
-    TABLESPACE pg_default;
+    (check_rule_category_cd ASC NULLS LAST);

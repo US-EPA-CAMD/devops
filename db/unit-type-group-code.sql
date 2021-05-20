@@ -24,6 +24,10 @@ INSERT INTO camdmd.unit_type_group_code(
 
 INSERT INTO camdmd.unit_type_group_code(
 	unit_type_group_cd, unit_type_group_description)
+	VALUES ('F', 'Furnace');
+
+INSERT INTO camdmd.unit_type_group_code(
+	unit_type_group_cd, unit_type_group_description)
 	VALUES ('T', 'Turbines');
 
 -- MODIFY UNIT_TYPE_CODE TO INCLUDE GROUP
@@ -42,6 +46,10 @@ where unit_type_cd in ('CC','CT','ICE','OT','IGC');
 update camdmd.unit_type_code
 set unit_type_group_cd = 'B'
 where unit_type_cd not in ('CC','CT','ICE','OT','IGC');
+
+update camdmd.unit_type_code
+set unit_type_group_cd = 'F'
+where unit_type_cd in ('PRH','KLN');
 
 
 -- MODIFY UNIT_TYPE_CODE TO MAKE GROUP NOT NULL
