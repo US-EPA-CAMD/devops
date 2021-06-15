@@ -3,9 +3,7 @@ CREATE TABLE camdmd.unit_type_group_code
     unit_type_group_cd character varying(7) COLLATE pg_catalog."default" NOT NULL,
     unit_type_group_description character varying(1000) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT pk_unit_type_group_code PRIMARY KEY (unit_type_group_cd)
-)
-
-TABLESPACE pg_default;
+);
 
 COMMENT ON TABLE camdmd.unit_type_group_code
     IS 'Lookup table containing the groups of unit types to which unit type codes correspond.';
@@ -24,7 +22,7 @@ INSERT INTO camdmd.unit_type_group_code(
 
 INSERT INTO camdmd.unit_type_group_code(
 	unit_type_group_cd, unit_type_group_description)
-	VALUES ('F', 'Furnace');
+	VALUES ('F', 'Furnaces');
 
 INSERT INTO camdmd.unit_type_group_code(
 	unit_type_group_cd, unit_type_group_description)

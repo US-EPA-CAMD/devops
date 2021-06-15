@@ -10,13 +10,13 @@ CREATE TABLE camdecmpsaux.check_rule_type
 );
 
 COMMENT ON TABLE camdecmpsaux.check_rule_type
-    IS 'Lookup table of check rule types.';
+    IS 'Lookup table for Code Effects BRE rule editor modes.';
 
 COMMENT ON COLUMN camdecmpsaux.check_rule_type.check_rule_type_cd
-    IS 'Code used to identify check rule type.';
+    IS 'Code used to identify Code Effects BRE rule editor mode.';
 
 COMMENT ON COLUMN camdecmpsaux.check_rule_type.check_rule_type_description
-    IS 'Description of check rule type.';
+    IS 'Description of Code Effects BRE rule editor mode.';
 
 
 insert into camdecmpsaux.check_rule_type(check_rule_type_cd, check_rule_type_description) values('Loop', 'Loop Mode');

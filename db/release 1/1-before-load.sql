@@ -4,6 +4,15 @@ ALTER TABLE IF EXISTS camdmd.account_type_code
 
 DROP TABLE IF EXISTS camdmd.account_type_group_code;
 
+-- PROGRAM_CODE
+ALTER TABLE IF EXISTS camdmd.program_code
+    DROP COLUMN IF EXISTS emissions_ind;
+
+ALTER TABLE IF EXISTS camdmd.program_code
+    DROP COLUMN IF EXISTS allowance_ind;
+
+ALTER TABLE IF EXISTS camdmd.program_code
+    DROP COLUMN IF EXISTS compliance_ind;
 
 -- UNIT TYPE
 ALTER TABLE IF EXISTS camdmd.unit_type_code

@@ -23,7 +23,7 @@ CREATE TABLE camdecmpsaux.check_rule
     CONSTRAINT fk_check_rule_type FOREIGN KEY (check_rule_type_cd)
         REFERENCES camdecmpsaux.check_rule_type (check_rule_type_cd) MATCH SIMPLE,
     CONSTRAINT fk_check_rule_category FOREIGN KEY (check_rule_category_cd)
-        REFERENCES camdecmpsaux.check_rule_category (check_rule_category_cd) MATCH SIMPLE
+        REFERENCES camdecmpsaux.check_category (check_category_cd) MATCH SIMPLE
 );
 
 COMMENT ON TABLE camdecmpsaux.check_rule

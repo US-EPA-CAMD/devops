@@ -11,9 +11,9 @@ CREATE TABLE camdecmpsaux.check_rule_property
     CONSTRAINT fk_check_rule_property_property FOREIGN KEY (property_id)
         REFERENCES camdecmpsaux.property_metadata (property_id) MATCH SIMPLE,
     CONSTRAINT fk_check_rule_property_category FOREIGN KEY (check_rule_category_cd)
-        REFERENCES camdecmpsaux.check_rule_category (check_rule_category_cd) MATCH SIMPLE,
+        REFERENCES camdecmpsaux.check_category (check_rule_category_cd) MATCH SIMPLE,
     CONSTRAINT fk_check_rule_property_collection_item_source FOREIGN KEY (collection_item_source)
-        REFERENCES camdecmpsaux.check_rule_category (check_rule_category_cd) MATCH SIMPLE
+        REFERENCES camdecmpsaux.check_category (check_rule_category_cd) MATCH SIMPLE
 );
 
 COMMENT ON TABLE camdecmpsaux.check_rule_property
