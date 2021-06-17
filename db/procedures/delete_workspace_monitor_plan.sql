@@ -79,6 +79,44 @@ BEGIN
 	DELETE FROM camdecmpswks.monitor_method
 	WHERE mon_loc_id = ANY(monLocIds);
 
+	-- MONITOR_PLAN_COMMENT --
+	DELETE FROM camdecmpswks.monitor_plan_comment
+	WHERE mon_plan_id = monPlanId;
+
+	-- MONITOR_QUALIFICATION_LEE --
+	DELETE FROM camdecmpswks.monitor_qualification_lee
+	WHERE mon_qual_lee_id IN (
+		SELECT mon_qual_lee_id
+		FROM camdecmpswks.monitor_qualification_lee
+		JOIN camdecmpswks.monitor_qualification
+			USING (mon_qual_id)
+		WHERE mon_loc_id = ANY(monLocIds)
+	);
+
+	-- MONITOR_QUALIFICATION_LME --
+	DELETE FROM camdecmpswks.monitor_qualification_lme
+	WHERE mon_lme_id IN (
+		SELECT mon_lme_id
+		FROM camdecmpswks.monitor_qualification_lme
+		JOIN camdecmpswks.monitor_qualification
+			USING (mon_qual_id)
+		WHERE mon_loc_id = ANY(monLocIds)
+	);
+
+	-- MONITOR_QUALIFICATION_PCT --
+	DELETE FROM camdecmpswks.monitor_qualification_pct
+	WHERE mon_pct_id IN (
+		SELECT mon_pct_id
+		FROM camdecmpswks.monitor_qualification_pct
+		JOIN camdecmpswks.monitor_qualification
+			USING (mon_qual_id)
+		WHERE mon_loc_id = ANY(monLocIds)
+	);
+
+	-- MONITOR_QUALIFICATION --
+	DELETE FROM camdecmpswks.monitor_qualification
+	WHERE mon_loc_id = ANY(monLocIds);
+
 	-- MONITOR_SPAN --
 	DELETE FROM camdecmpswks.monitor_span
 	WHERE mon_loc_id = ANY(monLocIds);
