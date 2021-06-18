@@ -6,13 +6,13 @@ DROP TABLE IF EXISTS camdmd.account_type_group_code;
 
 -- PROGRAM_CODE
 ALTER TABLE IF EXISTS camdmd.program_code
-    DROP COLUMN IF EXISTS emissions_ind;
+    DROP COLUMN IF EXISTS emissions_ui_filter;
 
 ALTER TABLE IF EXISTS camdmd.program_code
-    DROP COLUMN IF EXISTS allowance_ind;
+    DROP COLUMN IF EXISTS allowance_ui_filter;
 
 ALTER TABLE IF EXISTS camdmd.program_code
-    DROP COLUMN IF EXISTS compliance_ind;
+    DROP COLUMN IF EXISTS compliance_ui_filter;
 
 -- UNIT TYPE
 ALTER TABLE IF EXISTS camdmd.unit_type_code

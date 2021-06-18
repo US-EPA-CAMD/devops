@@ -2,24 +2,24 @@
 -- PROGRAM CODE UPDATES 
 --------------------------------------------------
 ALTER TABLE camdmd.program_code
-    ADD COLUMN emissions_ind numeric(1,0) NOT NULL DEFAULT 0;
+    ADD COLUMN emissions_ui_filter numeric(1,0) NOT NULL DEFAULT 0;
 
 ALTER TABLE camdmd.program_code
-    ADD COLUMN allowance_ind numeric(1,0) NOT NULL DEFAULT 0;
+    ADD COLUMN allowance_ui_filter numeric(1,0) NOT NULL DEFAULT 0;
 
 ALTER TABLE camdmd.program_code
-    ADD COLUMN compliance_ind numeric(1,0) NOT NULL DEFAULT 0;
+    ADD COLUMN compliance_ui_filter numeric(1,0) NOT NULL DEFAULT 0;
 
 update camdmd.program_code
-set emissions_ind = 1
+set emissions_ui_filter = 1
 where prg_cd not in ('MATS');
 
 update camdmd.program_code
-set allowance_ind = 1
+set allowance_ui_filter = 1
 where prg_cd not in ('MATS', 'NHNOX', 'NSPS4T', 'RGGI', 'SIPNOX');
 
 update camdmd.program_code
-set compliance_ind = 1
+set compliance_ui_filter = 1
 where prg_cd in ('ARP', 'CSNOX', 'CSOSG1', 'CSOSG2', 'CSSO2G1', 'CSSO2G2', 'TXSO2', 'CSNOXOS');
 
 update camdmd.program_code
