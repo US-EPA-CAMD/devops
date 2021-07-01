@@ -8,10 +8,12 @@ fi
 
 if [ "$CF_ORG_SPACE" != "dev" ]
 then
+  sudo apt-cache show yq
+
   echo "Installing yq YAML parser..."
   sudo add-apt-repository ppa:rmescandon/yq
   sudo apt update
-  sudo apt install yq=3.3.2 -V
+  sudo apt install yq=3.3.2 -y
 
   echo ""
   echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
