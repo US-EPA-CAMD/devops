@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 if [[ $(cf app $APP_NAME) == *"FAILED"* ]]
@@ -8,9 +9,14 @@ fi
 
 if [ "$CF_ORG_SPACE" != "dev" ]
 then
-  cp manifest-vars.$CF_ORG_SPACE.yml manifest-vars.yml
-  echo "Using manifest-vars.${CF_ORG_SPACE}.yml"
-  cat manifest-vars.yml
+  echo "Installing yq YAML parser..."
+  wget https://github.com/mikefarah/yq/releases/download/v4.9.8/yq_linux_amd64.tar.gz -O - |\
+  tar xz && sudo mv yq_linux_amd64 /usr/bin/yq
+
+  echo ""
+  echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
+  yq eval-all 'select(fileIndex == 0) * select(filename == "manifest-vars.$CF_ORG_SPACE.yml")' manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
+  echo ""  
 fi
 
 PREFIX="${ENV_VAR_PREFIX}_${APP_NAME//-/_}"
