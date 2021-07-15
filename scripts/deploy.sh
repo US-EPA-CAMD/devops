@@ -15,7 +15,7 @@ then
 
   echo ""
   echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
-  yq eval-all 'select(fileIndex == 0) * select(filename == "manifest-vars.$CF_ORG_SPACE.yml")' manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
+  yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' manifest-vars.yml manifest-vars.$CF_ORG_SPACE.yml >> manifest-vars.yml
   echo ""  
 fi
 
