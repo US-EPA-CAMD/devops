@@ -11,7 +11,7 @@ if [ "$CF_ORG_SPACE" != "dev" ]
 then
   echo "Installing yq YAML parser..."
   wget https://github.com/mikefarah/yq/releases/download/v4.9.8/yq_linux_amd64.tar.gz -O - |\
-  tar xz && mv yq_linux_amd64 /usr/bin/yq
+  tar xz && sudo mv yq_linux_amd64 /usr/bin/yq
 
   echo ""
   echo "Merging manifest-vars.yml and manifest-vars.$CF_ORG_SPACE.yml files..."
