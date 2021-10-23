@@ -1,11 +1,11 @@
-name: "Emissions Management ZAP Scan"
+name: "Account Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '15 1 * * *'
+    - cron: '30 4 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
-    name: Scan Emissions Management
+    name: Scan Account Mgmt API
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -18,13 +18,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
-          issue_title: 'OWASP Scan - Emissions Management'
-          target: 'https://easey-dev.app.cloud.gov/api/emissions-mgmt/swagger'
+          issue_title: 'Account Mgmt API ZAP Scan'
+          target: 'https://easey-dev.app.cloud.gov/api/account-mgmt/swagger'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
-        run: scripts/zap-api-scan.sh Emissions-Management
+        run: scripts/zap-api-scan.sh easey-account-api
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
-
-          

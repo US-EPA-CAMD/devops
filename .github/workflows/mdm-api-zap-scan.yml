@@ -1,11 +1,11 @@
-name: "Master Data Management ZAP Scan"
+name: "Master Data Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '45 3 * * *'
+    - cron: '30 5 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
-    name: Scan Master Data  Management
+    name: Scan Master Data Mgmt API
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -18,11 +18,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
-          issue_title: 'OWASP Scan - Master Data Management'
-          target: 'https://easey-dev.app.cloud.gov/api/master-data-mgmt/SWAGGER'
+          issue_title: 'Master Data Mgmt API ZAP Scan'
+          target: 'https://easey-dev.app.cloud.gov/api/master-data-mgmt/swagger'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
-        run: scripts/zap-api-scan.sh Master-Data-Management
+        run: scripts/zap-api-scan.sh easey-mdm-api
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
