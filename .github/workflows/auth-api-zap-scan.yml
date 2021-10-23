@@ -1,7 +1,7 @@
 name: "Auth Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '45 4 * * *'
+    - cron: '15 6 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 name: "Emissions Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '30 6 * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
