@@ -23,6 +23,10 @@ echo "Package: $name.$version"
 echo ""
 
 case $1 in
+  (BETA)
+    echo "CF_ORG_SPACE=beta" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=beta"
+    ;;
   (TEST)
     echo "CF_ORG_SPACE=test" >> $GITHUB_ENV
     echo "CF_ORG_SPACE=test"
