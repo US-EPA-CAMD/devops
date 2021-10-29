@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "--------------------------------------"
+echo "-- environment-variables-noTags.sh ---"
+echo "--------------------------------------"
+
 echo "Initialing & Configuring environment..."
 echo "Environment: $1"
 

@@ -5,5 +5,5 @@ echo "--------- npm/unit-tests.sh ----------"
 echo "--------------------------------------"
 
 echo "Running Unit tests... "
-CI=true npm run test
+CI=true yarn run test
 sed -i.bak 's|SF:'`pwd`'|SF:/github/workspace/|' coverage/lcov.info

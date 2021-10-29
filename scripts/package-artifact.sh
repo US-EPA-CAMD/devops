@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "--------------------------------------"
+echo "-------- package-artifact.sh ---------"
+echo "--------------------------------------"
+
 echo "Retrieving app, version, and build #..."
 echo "App Name: $APP_NAME"
 echo "App Version: $APP_VERSION"

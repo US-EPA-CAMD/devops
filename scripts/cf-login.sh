@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "--------------------------------------"
+echo "------------ cf-login.sh -------------"
+echo "--------------------------------------"
+
 echo "Initiating cloud.gov login... "
 cf api  $CF_API_URL
 

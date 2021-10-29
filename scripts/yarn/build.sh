@@ -1,11 +1,11 @@
 #!/bin/bash
 
 echo "--------------------------------------"
-echo "----------- npm/build.sh ------------"
+echo "----------- yarn/build.sh ------------"
 echo "--------------------------------------"
 
 echo "Installing dependencies..."
-npm install
+yarn install --ignore-engines
 
 echo "Building..."
-CI=false npm run build
+CI=false yarn build

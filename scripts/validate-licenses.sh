@@ -1,4 +1,9 @@
 #!/bin/bash
+
+echo "--------------------------------------"
+echo "------- validate-licenses.sh ---------"
+echo "--------------------------------------"
+
 function print_unapproved () {
     gawk '
     BEGIN {

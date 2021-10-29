@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "--------------------------------------"
+echo "------ environment-variables.sh ------"
+echo "--------------------------------------"
+
 echo "Initialing & Configuring environment..."
 echo ""
 

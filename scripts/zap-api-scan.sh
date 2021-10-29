@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "--------------------------------------"
+echo "--------- zap-api-scan.sh ------------"
+echo "--------------------------------------"
+
 cd $GITHUB_WORKSPACE
 DATE=$(date +"%m-%d-%Y.%H:%M:%S")
 zip $1-zapscan-$GITHUB_RUN_NUMBER-$DATE.zip report_html.html report_json.json report_md.md

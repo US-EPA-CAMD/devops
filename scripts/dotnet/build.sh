@@ -1,11 +1,11 @@
 #!/bin/bash
 
 echo "--------------------------------------"
-echo "----------- npm/build.sh ------------"
+echo "---------- dotnet/build.sh -----------"
 echo "--------------------------------------"
 
 echo "Installing dependencies..."
-npm install
+dotnet restore
 
 echo "Building..."
-CI=false npm run build
+CI=false dotnet build
