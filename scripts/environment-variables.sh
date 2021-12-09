@@ -7,7 +7,7 @@ echo "--------------------------------------"
 echo "Initialing & Configuring environment..."
 echo ""
 
-name=$(grep name manifest-vars.yml | cut -d':' -f2 | xargs)
+name=$(grep -w name manifest-vars.yml | cut -d':' -f2 | xargs)
 echo "APP_NAME=$name" >> $GITHUB_ENV
 echo "ENV_VAR_PREFIX=$ENV_VAR_PREFIX" >> $GITHUB_ENV
 echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
