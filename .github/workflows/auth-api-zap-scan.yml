@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Auth Mgmt API ZAP Scan'
-          target: 'https://easey-dev.app.cloud.gov/api/auth-mgmt/swagger'
+          target: 'https://api-easey-dev.app.cloud.gov/auth-mgmt/swagger'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-auth-api
