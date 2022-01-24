@@ -32,7 +32,7 @@ echo "--------------------------------"
 if ! command -v cf version 
 then
         echo "installing cf cli"
-        ./scripts/install-cf-cli.sh
+        ./install-cf-cli.sh
 else
         echo "cf cli already installed"
         cf version
