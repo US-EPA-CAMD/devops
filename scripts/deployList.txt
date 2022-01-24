@@ -1,0 +1,5 @@
+EASEY v1.0.0 account-api
+EASEY v1.0.0 emissions-api
+EASEY v1.0.0 facilities-api
+EASEY v1.0.0 mdm-api
+REACT_APP_EASEY v1.0.0 campd-ui api-key opt2 opt3 opt4
