@@ -1,6 +1,6 @@
 # Development Operations (DevOps)
 
-[![GitHub](https://img.shields.io/github/license/US-EPA-CAMD/devops)](https://github.com/US-EPA-CAMD/devops/blob/master/LICENSE)
+[![GitHub](https://img.shields.io/github/license/US-EPA-CAMD/devops)](https://github.com/US-EPA-CAMD/devops/blob/develop/LICENSE)
 [![Account API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Account%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
 [![Auth API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Auth%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
 [![Emissions API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Emissions%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
