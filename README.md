@@ -1,5 +1,3 @@
-# Development Operations (DevOps)
-
 [![GitHub](https://img.shields.io/github/license/US-EPA-CAMD/devops)](https://github.com/US-EPA-CAMD/devops/blob/develop/LICENSE)
 [![Account API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Account%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
 [![Auth API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Auth%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
@@ -9,6 +7,8 @@
 [![Monitor Plan API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Monitor%20Plan%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
 [![Quartz API ZAP Scan](https://github.com/US-EPA-CAMD/devops/workflows/Quartz%20Mgmt%20API%20ZAP%20Scan/badge.svg)](https://github.com/US-EPA-CAMD/devops/actions)
 <br>
+
+# `Development Operations (DevOps)`
 This repo stores common shared devops related files used by one or more repos within the US EPA CAMD organization
 
 ## Cloud Foundry CLI
