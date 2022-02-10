@@ -1,14 +1,12 @@
 ## Getting Started
-
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-
-- Set environment variables
-- Establish cloud.gov SSH tunnel
+- [Cloud.gov Setup & Configuration](https://cloud.gov/docs/getting-started/setup/)
+- [Configure Environment Variables](#Environment Variables)
+- [Establish Cloud.gov SSH Tunnel](#Cloud.gov SSH tunnel)
 
 **Environment Variables**
-
 You will need to set up the following environment variables in order to access the database. These are to be used for development purposes only.
 
 - EASEY_DB_HOST: localhost
@@ -22,77 +20,50 @@ Please reach out to an EPA tech lead (see Mike Heese or Jason Whitehead) to get 
  
 
 **Cloud.gov SSH tunnel**
-
 1. [Log in and set up the command line](https://cloud.gov/docs/getting-started/setup/#set-up-the-command-line) 
-
 2. Target the development org (you will need to be granted permission to access this):
-```bash
+```
 $ cf target -o epa-easey -s dev
 ```
 3. Open SSH tunnel
-```bash
+```
 $ cf ssh auth-api -L <LOCAL_PORT>:<DB_HOST>:5432
 ```
 4. Keep the SSH tunnel open while running the application
+> NOTE: For more information on Cloud.gov, please refer to their [documentation](https://cloud.gov/docs/).
 
-> NOTE: For more information on cloud.gov, please refer to their [documentation](https://cloud.gov/docs/).
 
-### Installing
-1. Open your terminal and navigate to the directory you wish to store this repository.
+## Building, Testing, & Running the application
+From within the projects root directory run the following commands using the yarn command line interface
 
-2. Clone this repository
-
-    ```shell
-    # If using SSH
-    $ git clone git@github.com:US-EPA-CAMD/REPOSITORY_NAME.git
-    
-    # If using HTTPS
-    $ git clone https://github.com/US-EPA-CAMD/REPOSITORY_NAME.git
-    ```
-
-3. Navigate to the root project directory
-
-    ```
-    $ cd REPOSITORY_NAME
-    ```
-
-4. Install dependencies 
-    
-    ```
-    $ yarn install
-    ```
-### Run the appication 
-
-From within the project directory, you can run:
-
-```bash
-# Runs the api in the development mode
+**Run in development mode**
+```
 $ yarn start:dev
 ```
 
-The page will reload if you make edits via the use of nodemon.<br />
-You will also see any lint errors in the console.
+**Install/update package dependencies & run in development mode**
+```
+$ yarn up
+```
 
-```bash
-# for production mode
+**Unit tests**
+```
+$ yarn test
+```
+
+**Build**
+```
+$ yarn build
+```
+
+**Run in production mode**
+```
 $ yarn start
 ```
 
-### Run the tests
-
-```bash
-# unit tests
-$ yarn test
-
-# e2e tests
-$ yarn test:e2e
-
-# test coverage
-$ yarn test:cov
-```
-
 ## Built With
-​
-[NestJS](https://nestjs.com/) - server-side Node.js framework
+[ReactJS](https://reactjs.org) a free open-source front-end JavaScript library and web development framework for building user interfaces based on UI components
 
-[Cloud.gov](https://cloud.gov/) - Platform as a Service (PaaS)
+[NestJS](https://nestjs.com) a free open-source framework for building efficient and scalable Node.js server-side applications using Typescript and combines elements of OOP (Object Oriented Programming), FP (Functional Programming), and FRP (Functional Reactive Programming) 
+
+[Cloud.gov](https://cloud.gov) a FedRAMP authorized Cloud Platform as a Service (PaaS) built on AWS for US Government agencies
