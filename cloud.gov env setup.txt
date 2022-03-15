@@ -15,10 +15,19 @@ cf service-key \
     deployment-svc \
     deployment-svc-key
 
+# select size of DB
+SELECT pg_size_pretty( pg_database_size('cgawsbrokerprodr97macy19l') );
+
 # create postgres instance
 cf create-service \
     aws-rds \
-    small-psql \
+    xlarge-gp-psql \
+    camd-pg-db \
+    -c '{ "storage": 100, "enable_functions": true }'
+
+cf create-service \
+    aws-rds \
+    xlarge-gp-psql-redundant \
     camd-pg-db \
     -c '{ "storage": 100, "enable_functions": true }'
 
