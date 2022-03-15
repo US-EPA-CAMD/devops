@@ -5,7 +5,6 @@ echo "------- download-artifcat.sh ---------"
 echo "--------------------------------------"
 
 echo "Retrieving package from deployment artifacts..."
-echo "aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip"
 objectDetails=$(aws s3api  head-object --bucket $ARTIFACTS_STORAGE --key $PACKAGE.zip)
 echo $objectDetails
 
