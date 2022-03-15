@@ -51,7 +51,7 @@ echo "--------------------------------"
 while read file; do
         if [[ ! $file == //* ]]
         then  
-	       ./devops/scripts/deployProd.sh $file
+	       ./devops/scripts/deploy-prod.sh $file
         fi
-done <./devops/scripts/deployList.txt
+done <./devops/scripts/deploy-list.txt
 
