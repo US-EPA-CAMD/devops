@@ -55,7 +55,7 @@ esac
 # 	# cf set-env $APP_NAME 
 # done
 
-./devops/scripts/deploy.sh
+../devops/scripts/deploy.sh
 
 
 
