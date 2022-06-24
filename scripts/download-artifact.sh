@@ -20,3 +20,5 @@ fi
 echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
 rm $PACKAGE.zip
+
+chmod -R 600
