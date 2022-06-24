@@ -5,8 +5,6 @@ echo "--------------------------------------"
 echo "------------- deploy.sh --------------"
 echo "--------------------------------------"
 
-chmod -R 600
-
 if [[ $(cf app $APP_NAME) == *"FAILED"* ]]
 then
   echo "$APP_NAME application does not exist! Creating application shell..."
