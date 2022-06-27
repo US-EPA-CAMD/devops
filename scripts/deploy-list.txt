@@ -1,5 +1,1 @@
-EASEY v1.0.37 account-api 
-EASEY v1.0.51 emissions-api 
-EASEY v1.0.54 facilities-api 
-EASEY v1.0.5 streaming-services 
-REACT_APP_EASEY v1.0.51 campd-ui 
+EASEY v1.0.56 facilities-api 
