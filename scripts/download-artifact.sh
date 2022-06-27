@@ -20,6 +20,3 @@ fi
 echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
 rm $PACKAGE.zip
-
-echo "Setting file permissions to minimum required of 600..."
-sudo chmod -R 700 *
