@@ -43,6 +43,8 @@ jobs:
           ENV_VAR_PREFIX: EASEY
           PACKAGE: ${{ inputs.PACKAGE }}
           ENV: ${{ inputs.ENV }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
       - name: Install cf cli
         run: devops/scripts/install-cf-cli.sh
       - name: Login to cloud.gov
