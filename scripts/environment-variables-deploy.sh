@@ -20,7 +20,7 @@ echo "ARTIFACTS_STORAGE=$artifacts_storage" >> $GITHUB_ENV
 # version=$(grep sonar.projectVersion sonar-project.properties | cut -d'=' -f2)
 # version=$version.$GITHUB_RUN_NUMBER
 if [[ $PACKAGE == "latest" ]]; then
-  PACKAGE = $(aws s3api list-objects --bucket $artifacts_storage --prefix $name --output text --query 'Contents[].{Key: Key}' | tail -n1)
+  PACKAGE=$(aws s3api list-objects --bucket $artifacts_storage --prefix $name --output text --query 'Contents[].{Key: Key}' | tail -n1)
 fi
 echo "PACKAGE=$PACKAGE" >> $GITHUB_ENV
 echo "Package: $PACKAGE"
