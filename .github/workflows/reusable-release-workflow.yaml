@@ -7,8 +7,8 @@ on:
         description: 'Environmnet to Deploy to (should be from dropdown)'
         required: true
         type: string
-      VERSION:
-        description: 'Version of app to deploy, set to latest (default) to fetch latest package'
+      PACKAGE:
+        description: 'Package name to deploy, set to latest (default) to fetch latest package'
         required: false
         default: 'latest'
         type: string
@@ -41,7 +41,7 @@ jobs:
         run: devops/scripts/environment-variables-deploy.sh
         env:
           ENV_VAR_PREFIX: EASEY
-          VERSION: ${{ inputs.VERSION }}
+          PACKAGE: ${{ inputs.PACKAGE }}
           ENV: ${{ inputs.ENV }}
       - name: Install cf cli
         run: devops/scripts/install-cf-cli.sh
