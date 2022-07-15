@@ -1,1 +1,4 @@
-EASEY v1.0.56 facilities-api 
+EASEY v1.0.39 account-api 
+EASEY v1.0.57 facilities-api 
+EASEY v1.0.6 streaming-services 
+REACT_APP_EASEY v1.0.64 campd-ui 
