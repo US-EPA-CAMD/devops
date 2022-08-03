@@ -12,21 +12,17 @@ on:
         required: false
         default: 'latest'
         type: string
-    secrets:
-      CF_ENV_DEPLOYMENT_SVC:
-        required: true
-      CF_ENV_DEPLOYMENT_SVC_PWD:
-        required: true
-      ARTIFACTS_STORAGE_ACCESS_KEY_ID:
-        required: true
-      ARTIFACTS_STORAGE_SECRET_ACCESS_KEY:
-        required: true
+    secrets: inherit
 jobs:
   Deployment:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.ENV }}
       url: https://api.epa.gov/easey/${{ inputs.ENV.lowercase }}/camd-services/swagger
+    env:
+      URL: 'https://api.epa.gov/easey/'
+      CF_ENV_DEPLOYMENT_SVC
+      CF_ENV_DEPLOYMENT_SVC_PWD
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -50,8 +46,8 @@ jobs:
       - name: Login to cloud.gov
         run: devops/scripts/cf-login.sh
         env:
-          CF_USERNAME: ${{ secrets.CF_ENV_DEPLOYMENT_SVC }}
-          CF_PASSWORD: ${{ secrets.CF_ENV_DEPLOYMENT_SVC_PWD }}
+          CF_USERNAME: ${{ env.CF_ENV_DEPLOYMENT_SVC }}
+          CF_PASSWORD: ${{ env.CF_ENV_DEPLOYMENT_SVC_PWD }}
       - name: Download Deployment Package
         run: devops/scripts/download-artifact.sh
         env:
