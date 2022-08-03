@@ -1,2 +1,1 @@
-EASEY v1.0.57 facilities-api 
-EASEY v1.0.6 streaming-services 
+EASEY v1.0.39 account-api 
