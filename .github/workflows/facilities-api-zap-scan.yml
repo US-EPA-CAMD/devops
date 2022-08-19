@@ -1,7 +1,8 @@
 name: "Facilities Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '45 6 * * *'
+    - cron: '0 6 * * 6'
+  workflow_dispatch
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
@@ -19,7 +20,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Facilities Mgmt API ZAP Scan'
-          target: 'https://api-easey-dev.app.cloud.gov/facility-mgmt/swagger'
+          target: 'https://api-easey-dev.app.cloud.gov/facility-mgmt/swagger-json'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
