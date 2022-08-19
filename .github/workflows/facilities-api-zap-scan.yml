@@ -1,8 +1,5 @@
 name: "Facilities Mgmt API ZAP Scan"
-on:
-  schedule:
-    - cron: '0 6 * * 6'
-  workflow_dispatch
+on: workflow_dispatch
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
