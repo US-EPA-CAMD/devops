@@ -12,13 +12,15 @@ jobs:
       - name: Configure Env Vars
         run: scripts/environment-variables.sh          
       - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.4.0
+        uses: zaproxy/action-api-scan@v0.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
+          format: openapi
           issue_title: 'Facilities Mgmt API ZAP Scan'
           target: 'https://api-easey-dev.app.cloud.gov/facilities-mgmt/swagger-json'
-          cmd_options: '-a -c rules.tsv'
+          rules_file_name: 'rules.tsv'
+          cmd_options: '-a'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
         env:
