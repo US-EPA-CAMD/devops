@@ -18,7 +18,8 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Facilities Mgmt API ZAP Scan'
           target: 'https://api-easey-dev.app.cloud.gov/facilities-mgmt/swagger-json'
-          cmd_options: '-a -c rules.tsv'
+          rules_file_name: 'rules.tsv'
+          cmd_options: '-a -f openapi'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
         env:
