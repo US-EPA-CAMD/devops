@@ -1,11 +1,11 @@
-name: "Account Mgmt API ZAP Scan"
-on:
+name: "CAMD Administrative & General Services ZAP Scan"
+on: 
   schedule:
-    - cron: '0 6 * * 6'
+    - cron: '40 6 * * 6'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
-    name: Scan Account Mgmt API
+    name: Scan CAMD Administrative & General Services
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -18,11 +18,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
-          issue_title: 'Account Mgmt API ZAP Scan'
-          target: 'https://api-easey-dev.app.cloud.gov/account-mgmt/swagger-json'
+          issue_title: 'CAMD Administrative & General Services ZAP Scan'
+          target: 'https://api-easey-dev.app.cloud.gov/camd-services/swagger-json'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
-        run: scripts/zap-api-scan.sh easey-account-api
+        run: scripts/zap-api-scan.sh easey-camd-services
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}

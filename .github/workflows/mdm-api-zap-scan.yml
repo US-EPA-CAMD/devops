@@ -1,5 +1,7 @@
 name: "Master Data Mgmt API ZAP Scan"
-on: workflow_dispatch
+on: 
+  schedule:
+    - cron: '20 6 * * 6'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest

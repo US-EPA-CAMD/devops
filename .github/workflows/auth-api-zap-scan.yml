@@ -1,7 +1,7 @@
 name: "Auth Mgmt API ZAP Scan"
 on:
   schedule:
-    - cron: '15 6 * * *'
+    - cron: '5 6 * * 6'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
@@ -14,12 +14,12 @@ jobs:
       - name: Configure Env Vars
         run: scripts/environment-variables.sh          
       - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.2.0
+        uses: zaproxy/action-api-scan@v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Auth Mgmt API ZAP Scan'
-          target: 'https://api-easey-dev.app.cloud.gov/auth-mgmt/swagger'
+          target: 'https://api-easey-dev.app.cloud.gov/auth-mgmt/swagger-json'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-auth-api
