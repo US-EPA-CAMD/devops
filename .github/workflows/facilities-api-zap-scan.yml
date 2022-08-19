@@ -17,7 +17,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Facilities Mgmt API ZAP Scan'
-          target: 'https://api-easey-dev.app.cloud.gov/facility-mgmt/swagger-json'
+          target: 'https://api-easey-dev.app.cloud.gov/facilities-mgmt/swagger-json'
           cmd_options: '-a -c rules.tsv'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
