@@ -1,5 +1,6 @@
 name: "Facilities Mgmt API ZAP Scan"
 on: 
+  workflow_dispatch:
   schedule:
     - cron: '15 6 * * 6'
 jobs:
@@ -20,7 +21,9 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           issue_title: 'Facilities Mgmt API ZAP Scan'
           target: 'https://api-easey-dev.app.cloud.gov/facilities-mgmt/swagger-json'
-          cmd_options: '-a -c rules.tsv'
+          cmd_options: '-a -c rules.tsv \
+            -z "-configfile api-zap-scan.prop \
+            -config replacer.full_list\\(1\\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"'
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
         env:

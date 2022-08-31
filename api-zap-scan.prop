@@ -1,0 +1,5 @@
+  -config replacer.full_list\\(0\\).description=auth1 \  
+  -config replacer.full_list\\(0\\).enabled=true \  
+  -config replacer.full_list\\(0\\).matchtype=REQ_HEADER \  
+  -config replacer.full_list\\(0\\).matchstr=x-api-key \  
+  -config replacer.full_list\\(0\\).regex=false
