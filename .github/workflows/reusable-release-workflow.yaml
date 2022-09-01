@@ -12,7 +12,6 @@ on:
         required: false
         default: 'latest'
         type: string
-    secrets: inherit
 jobs:
   Deployment:
     runs-on: ubuntu-latest
@@ -21,8 +20,6 @@ jobs:
       url: https://api.epa.gov/easey/${{ inputs.ENV.lowercase }}/camd-services/swagger
     env:
       URL: 'https://api.epa.gov/easey/'
-      CF_ENV_DEPLOYMENT_SVC
-      CF_ENV_DEPLOYMENT_SVC_PWD
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
