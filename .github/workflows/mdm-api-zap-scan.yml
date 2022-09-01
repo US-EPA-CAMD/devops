@@ -25,12 +25,12 @@ jobs:
           target: 'https://api-easey-dev.app.cloud.gov/master-data-mgmt/swagger-json'
           cmd_options: |
             -a -c rules.tsv \
-            -z "-config replacer.full_list\\(0\\).description=auth1 \  
+            -z "\"-config replacer.full_list\\(0\\).description=auth1 \  
                 -config replacer.full_list\\(0\\).enabled=true \  
                 -config replacer.full_list\\(0\\).matchtype=REQ_HEADER \  
                 -config replacer.full_list\\(0\\).matchstr=x-api-key \  
                 -config replacer.full_list\\(0\\).regex=false \
-                -config replacer.full_list\\(0\\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"
+                -config replacer.full_list\\(0\\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}\""
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-mdm-api
         env:
