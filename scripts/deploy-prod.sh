@@ -34,26 +34,7 @@ echo "--------------------------------"
 echo "-- environment secret ----------"
 echo "--------------------------------"
 
-case $APP_NAME in 
-
-	campd-ui)
-		echo "cf set-env $APP_NAME REACT_APP_CAMPD_API_KEY $REACT_APP_CAMPD_API_KEY"
-		;;
-
-	other-api)
-		echo "cf set-env $APP_NAME API_KEY $API_KEY"
-		;;
-
-	*)
-		;;
-esac
-	
-# while [ $# -gt 2 ]
-# do
-# 	shift 2
-# 	echo "cf set-env $APP_NAME $1 $2" 
-# 	# cf set-env $APP_NAME 
-# done
+../devops/scripts/$APP_NAME/configure-env-vars-secrets.sh
 
 ../devops/scripts/deploy.sh
 
