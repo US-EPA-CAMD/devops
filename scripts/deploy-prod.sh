@@ -15,6 +15,9 @@ echo "App Version: $APP_VERSION"
 export APP_NAME=$3
 echo "App Name: $APP_NAME"
 
+export BRANCH=$4
+echo "Branch: $BRANCH"
+
 export PACKAGE=$APP_NAME.$APP_VERSION
 echo "Package: $PACKAGE"
 
@@ -33,7 +36,7 @@ echo "--------------------------------"
 echo "-- environment secret ----------"
 echo "--------------------------------"
 
-curl -LJO https://raw.githubusercontent.com/US-EPA-CAMD/easey-$APP_NAME/develop/scripts/environment-variables-secrets.sh
+curl -LJO https://raw.githubusercontent.com/US-EPA-CAMD/easey-$APP_NAME/$BRANCH/scripts/environment-variables-secrets.sh
 
 ./environment-variables-secrets.sh
 
@@ -43,6 +46,7 @@ echo "--------------------------------"
 echo "-- clean up --------------------"
 echo "--------------------------------"
 
+echo "cleaning up $APP_NAME"
 cd ..
 rm -rf $APP_NAME
 
