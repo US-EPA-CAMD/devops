@@ -8,13 +8,15 @@ echo "Initialing & Configuring environment"
 
 export ENV_VAR_PREFIX=$1
 echo "ENV_VAR_PREFIX: $ENV_VAR_PREFIX"
-shift
 
-export APP_NAME=$2
+export APP_VERSION=$2
+echo "App Version: $APP_VERSION"
+
+export APP_NAME=$3
 echo "App Name: $APP_NAME"
 
-export APP_VERSION=$1
-echo "App Version: $APP_VERSION"
+export BRANCH=$4
+echo "Branch: $BRANCH"
 
 export PACKAGE=$APP_NAME.$APP_VERSION
 echo "Package: $PACKAGE"
@@ -34,16 +36,17 @@ echo "--------------------------------"
 echo "-- environment secret ----------"
 echo "--------------------------------"
 
-../devops/scripts/$APP_NAME/configure-env-vars-secrets.sh
+curl -LJO https://raw.githubusercontent.com/US-EPA-CAMD/easey-$APP_NAME/$BRANCH/scripts/environment-variables-secrets.sh
+
+./environment-variables-secrets.sh
 
 ../devops/scripts/deploy.sh
-
-
 
 echo "--------------------------------"
 echo "-- clean up --------------------"
 echo "--------------------------------"
 
+echo "cleaning up $APP_NAME"
 cd ..
 rm -rf $APP_NAME
 

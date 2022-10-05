@@ -5,7 +5,7 @@ echo "------------ cf-login.sh -------------"
 echo "--------------------------------------"
 
 echo "Initiating cloud.gov login... "
-cf api  $CF_API_URL
+cf api $CF_API_URL
 
 echo ""
 cf auth

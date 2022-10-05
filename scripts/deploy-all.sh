@@ -48,10 +48,15 @@ echo "--------------------------------"
 echo "-- deploy script ---------------"
 echo "--------------------------------"
 
+echo "MAKE SURE THERE IS A SPACE AFTER EACH LINE IN deploy-list.txt!!!"
+
 while read file; do
         if [[ ! $file == //* ]]
         then  
-	       ./devops/scripts/deploy-prod.sh $file
+	       ./devops/scripts/deploy-prod.sh $file &
         fi
 done <./devops/scripts/deploy-list.txt
 
+
+wait
+echo "All done"
