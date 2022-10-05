@@ -1,41 +1,62 @@
 # create deployment account
+Windows
+cf create-service cloud-gov-service-account space-deployer deployment-svc
+
+Debian
 cf create-service \
     cloud-gov-service-account \
     space-deployer \
     deployment-svc
 
 # create deployment account service key
+Windows
+cf create-service-key deployment-svc deployment-svc-key
+
+Debian
 cf create-service-key \
     deployment-svc \
     deployment-svc-key
 
 # retrieve deployment account service key
 # store username and password as organization secrets in Github (CF_DEV_DEPLOYMENT_SVC, CF_DEV_DEPLOYMENT_SVC_PWD)
+Windows
+cf service-key deployment-svc deployment-svc-key
+
+Debian
 cf service-key \
     deployment-svc \
     deployment-svc-key
 
 # select size of DB
-SELECT pg_size_pretty( pg_database_size('cgawsbrokerprodr97macy19l') );
+SELECT pg_size_pretty( pg_database_size('dbname') );
 
-# create postgres instance
+# create postgres instance NON PROD
+Windows
+cf create-service aws-rds xlarge-gp-psql camd-pg-db -c '{ \"storage\": 300, \"enable_functions\": true }'
+
+Debian
 cf create-service \
     aws-rds \
     xlarge-gp-psql \
     camd-pg-db \
-    -c '{ "storage": 100, "enable_functions": true }'
+    -c '{ "storage": 300, "enable_functions": true }'
 
+# create postgres instance PROD
+Windows
+cf create-service aws-rds xlarge-gp-psql-redundant camd-pg-db -c '{ \"storage\": 300, \"enable_functions\": true }'
+
+Debian
 cf create-service \
     aws-rds \
     xlarge-gp-psql-redundant \
     camd-pg-db \
-    -c '{ "storage": 100, "enable_functions": true }'
+    -c '{ "storage": 300, "enable_functions": true }'
 
 # create service keys for postgres access
-cf create-service-key \
-    camd-pg-db \
-    camd-pg-db-informatica
+Windows
+cf create-service-key camd-pg-db key-name
 
+Debian
 cf create-service-key \
     camd-pg-db \
-    camd-pg-db-developers
+    key-name
