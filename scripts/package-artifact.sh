@@ -11,7 +11,7 @@ echo "Build #: $GITHUB_RUN_NUMBER"
 echo ""
 
 echo "Building Artifact: $PACKAGE.zip"
-zip -q -r $PACKAGE.zip . -x '*.env*' -x '*.git*' -x '*.scanner*' -x '*node_modules*' -x '*coverage*'
+zip -q -r $PACKAGE.zip . -x '*.env*' -x '*.git*' -x '*.vscode*' -x '*.scanner*' -x '*node_modules*' -x '*coverage*' -x '*devops*'
 echo ""
 
 echo "Copying package to deployment artifacts..."
