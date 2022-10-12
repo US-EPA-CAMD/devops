@@ -21,7 +21,6 @@ echo "Branch: $BRANCH"
 export PACKAGE=$APP_NAME.$APP_VERSION
 echo "Package: $PACKAGE"
 
-# source ./devops/scripts/secrets.txt
 echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
 echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
 
@@ -36,9 +35,7 @@ echo "--------------------------------"
 echo "-- environment secret ----------"
 echo "--------------------------------"
 
-curl -LJO https://raw.githubusercontent.com/US-EPA-CAMD/easey-$APP_NAME/$BRANCH/scripts/environment-variables-secrets.sh
-
-./environment-variables-secrets.sh
+./scripts/environment-variables-secrets.sh
 
 ../devops/scripts/deploy.sh
 
@@ -49,4 +46,3 @@ echo "--------------------------------"
 echo "cleaning up $APP_NAME"
 cd ..
 rm -rf $APP_NAME
-

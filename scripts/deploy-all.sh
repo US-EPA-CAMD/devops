@@ -1,7 +1,5 @@
 #!/bin/bash
 
-pwd
-
 echo "--------------------------------"
 echo "-- environment variables -------"
 echo "--------------------------------"
@@ -56,7 +54,6 @@ while read file; do
 	       ./devops/scripts/deploy-prod.sh $file &
         fi
 done <./devops/scripts/deploy-list.txt
-
 
 wait
 echo "All done"
