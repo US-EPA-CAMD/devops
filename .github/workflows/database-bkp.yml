@@ -19,6 +19,9 @@ jobs:
       - name: Login to cloud.gov
         run: devops/scripts/cf-login.sh
         env:
+          CF_ORG_SPACE: dev
+          CF_ORG_NAME: epa-easey
+          CF_API_URL: https://api.fr.cloud.gov
           CF_USERNAME: ${{ secrets.CF_DEV_DEPLOYMENT_SVC }}
           CF_PASSWORD: ${{ secrets.CF_DEV_DEPLOYMENT_SVC_PWD }}
       - name: Establish SSH Tunnel
