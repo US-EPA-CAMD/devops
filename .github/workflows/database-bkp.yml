@@ -1,0 +1,41 @@
+name: "Database Backup"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  db-backup:
+    runs-on: ubuntu-latest
+    environment:
+      name: Dev
+    steps:
+      - name: Checkout devops repo
+        uses: actions/checkout@v2
+        with:
+          repository: US-EPA-CAMD/devops
+          path: devops
+      - name: Install cf cli
+        run: devops/scripts/install-cf-cli.sh
+      - name: Login to cloud.gov
+        run: devops/scripts/cf-login.sh
+        env:
+          CF_USERNAME: ${{ secrets.CF_DEV_DEPLOYMENT_SVC }}
+          CF_PASSWORD: ${{ secrets.CF_DEV_DEPLOYMENT_SVC_PWD }}
+      - name: Establish SSH Tunnel
+        run: cf ssh ssh-tunnel -L 15210:cg-aws-broker-prodrd97maecoyqs19l.ci7nkegdizyy.us-gov-west-1.rds.amazonaws.com:5432
+      - name: Backup
+        run: pg_dump -v -F c --no-acl --no-owner -f ~/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg postgresql://$PG_USER:$PG_PASSWORD@localhost:15210/$PG_DB
+        env:
+          PG_DB: ${{ secrets.PG_DB }}
+          PG_USER: ${{ secrets.PG_USER }}
+          PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      - name: Sync to S3
+        run: |
+          echo pwd
+          ls -a -l
+          aws s3 sync ~/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg s3://$BUCKET_NAME/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg
+        env:
+          AWS_DEFAULT_REGION: us-gov-west-1
+          BUCKET_NAME: cg-85627a9c-7d48-446a-8cb7-5daa5c694169
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
