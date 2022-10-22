@@ -27,15 +27,17 @@ jobs:
       - name: Establish SSH Tunnel
         run: cf v3-ssh ssh-tunnel -L 15210:cg-aws-broker-prodrd97maecoyqs19l.ci7nkegdizyy.us-gov-west-1.rds.amazonaws.com:5432
       - name: Backup
-        run: pg_dump -v -F c -s --schema camd --no-acl --no-owner -f ~/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg postgresql://$PG_USER:$PG_PASSWORD@localhost:15210/$PG_DB
+        run: |
+          mkdir ~/pgbkp
+          pg_dump -v -F c -s --schema camd --no-acl --no-owner -f ~/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg postgresql://$PG_USER:$PG_PASSWORD@localhost:15210/$PG_DB
         env:
           PG_DB: ${{ secrets.PG_DB }}
           PG_USER: ${{ secrets.PG_USER }}
           PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
       - name: Sync to S3
         run: |
-          echo pwd
-          ls -a -l
+          cd ~/pgbkp
+          ls -l -a
           aws s3 sync ~/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg s3://$BUCKET_NAME/pgbkp/epa-dev-bkp-$(date +%m-%d-%Y).pg
         env:
           AWS_DEFAULT_REGION: us-gov-west-1
