@@ -3,7 +3,7 @@ EASEY v1.1.62 account-api release/v1.1
 EASEY v1.1.55 mdm-api release/v1.1 
 EASEY v1.1.87 emissions-api release/v1.1 
 EASEY v1.1.62 auth-api release/v1.1 
-EASEY v1.1.52 camd-services release/v1.1 
+EASEY v1.1.53 camd-services release/v1.1 
 EASEY v1.1.28 streaming-services release/v1.1 
 EASEY v1.1.39 quartz-scheduler release/v1.1 
 EASEY v1.1.16 campd-tools-proxy release/v1.1 
