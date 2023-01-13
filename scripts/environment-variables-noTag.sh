@@ -47,6 +47,10 @@ case $1 in
     echo "CF_ORG_SPACE=perf" >> $GITHUB_ENV
     echo "CF_ORG_SPACE=perf"
     ;;
+  (PROD)
+    echo "CF_ORG_SPACE=prod" >> $GITHUB_ENV
+    echo "CF_ORG_SPACE=prod"
+    ;;
   # This is to match case of no tag for dev env as we do not want a malformed tag pushing to dev
   "")
     echo "CF_ORG_SPACE=dev" >> $GITHUB_ENV
