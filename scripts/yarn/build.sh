@@ -9,6 +9,7 @@ echo 'yarn-offline-mirror "./npm-packages-offline-cache"' >> .yarnrc
 echo 'yarn-offline-mirror-pruning true' >> .yarnrc
 
 echo "Installing dependencies..."
+rm -rf node_modules/ yarn.lock
 yarn install --ignore-engines
 
 echo "Building..."
