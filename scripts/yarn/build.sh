@@ -4,7 +4,7 @@ echo "--------------------------------------"
 echo "----------- yarn/build.sh ------------"
 echo "--------------------------------------"
 
-#echo "Configuring Yarn Offline NPM Package Cache..."
+echo "Configuring Yarn Offline NPM Package Cache..."
 echo 'yarn-offline-mirror "./npm-packages-offline-cache"' >> .yarnrc
 echo 'yarn-offline-mirror-pruning true' >> .yarnrc
 
