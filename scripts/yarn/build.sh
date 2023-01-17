@@ -5,11 +5,10 @@ echo "----------- yarn/build.sh ------------"
 echo "--------------------------------------"
 
 echo "Configuring Yarn Offline NPM Package Cache..."
-yarn config set yarn-offline-mirror ./npm-packages-offline-cache
-yarn config set yarn-offline-mirror-pruning true
+echo 'yarn-offline-mirror "./npm-packages-offline-cache"' >> .yarnrc
+echo 'yarn-offline-mirror-pruning true' >> .yarnrc
 
 echo "Installing dependencies..."
-rm -rf node_modules/
 yarn install --ignore-engines
 
 echo "Building..."
