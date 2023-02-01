@@ -16,7 +16,3 @@ yarn install --ignore-engines
 
 echo "Building..."
 CI=false yarn build
-
-ls -al
-cd npm-packages-offline-cache
-ls -al
