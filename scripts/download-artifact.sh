@@ -20,7 +20,3 @@ fi
 echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
 rm $PACKAGE.zip
-
-ls -al
-cd npm-packages-offline-cache
-ls -al
