@@ -21,3 +21,12 @@ fi
 echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
 rm $PACKAGE.zip
+
+echo "Yarn offline cache contents..."
+cd npm-packages-offline-cache/
+ls -al
+cd ..
+echo "Node Module contents..."
+cd node_modules/
+ls -al
+cd ..
