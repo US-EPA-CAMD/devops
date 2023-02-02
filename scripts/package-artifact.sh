@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 echo "--------------------------------------"
 echo "-------- package-artifact.sh ---------"
