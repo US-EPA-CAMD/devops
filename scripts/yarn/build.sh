@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 echo "--------------------------------------"
 echo "----------- yarn/build.sh ------------"
