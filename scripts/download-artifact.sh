@@ -22,6 +22,9 @@ echo "Extracting package..."
 unzip -q -o -u $PACKAGE.zip
 rm $PACKAGE.zip
 
+echo "App root contents..."
+ls -al
+
 echo "Yarn offline cache contents..."
 cd npm-packages-offline-cache/
 ls -al
