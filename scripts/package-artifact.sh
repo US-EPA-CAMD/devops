@@ -11,6 +11,9 @@ echo "App Version: $APP_VERSION"
 echo "Build #: $GITHUB_RUN_NUMBER"
 echo ""
 
+echo "App root contents..."
+ls -al
+
 echo "Yarn offline cache contents..."
 cd npm-packages-offline-cache/
 ls -al
