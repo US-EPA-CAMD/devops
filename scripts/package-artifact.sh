@@ -11,6 +11,11 @@ echo "App Version: $APP_VERSION"
 echo "Build #: $GITHUB_RUN_NUMBER"
 echo ""
 
+echo "Yarn offline cache contents..."
+cd npm-packages-offline-cache/
+ls -al
+cd ..
+
 echo "Building Artifact: $PACKAGE.zip"
 zip -q -r $PACKAGE.zip . -x '*.env*' '*.git*' '*.vscode*' '*.scanner*' '*coverage*' '*devops*' '*node_modules*' '*test-report*'
 echo ""
