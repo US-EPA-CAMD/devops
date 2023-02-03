@@ -20,7 +20,7 @@ ls -al
 cd ..
 
 echo "Building Artifact: $PACKAGE.zip"
-zip -q -r $PACKAGE.zip . -x '.env*' '.git/*' '.scannerwork/*' 'coverage/*' 'devops/*' 'node_modules/*'
+zip -q -r $PACKAGE.zip . -x '.env*' '.git/*' '.scannerwork/*' 'coverage/*' 'node_modules/*' 'test-report.xml'
 echo ""
 
 echo "Copying package to deployment artifacts..."
