@@ -18,6 +18,9 @@ yarn install --ignore-engines
 echo "Building..."
 CI=false yarn build
 
+echo "App root contents..."
+ls -al
+
 echo "Yarn offline cache contents..."
 cd npm-packages-offline-cache/
 ls -al
