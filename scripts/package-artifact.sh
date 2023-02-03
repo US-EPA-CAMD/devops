@@ -14,10 +14,13 @@ echo ""
 echo "App root contents..."
 ls -al
 
-echo "Yarn offline cache contents..."
-cd npm-packages-offline-cache/
-ls -al
-cd ..
+DIR="./npm-packages-offline-cache"
+if [ -d "$DIR" ]; then
+  echo "Yarn offline cache contents..."
+  cd $DIR
+  ls -al
+  cd ..
+fi
 
 echo "Building Artifact: $PACKAGE.zip"
 zip -q -r $PACKAGE.zip . -x '.env*' '.git/*' '.scannerwork/*' 'coverage/*' 'node_modules/*' 'test-report.xml'
