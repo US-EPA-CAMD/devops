@@ -11,6 +11,9 @@ cf api $CF_API_URL
 echo ""
 cf auth
 
+cf target
+cf spaces
+
 echo ""
 echo "Setting cloud.gov target organization and space... "
 cf target -o $CF_ORG_NAME -s $CF_ORG_SPACE
