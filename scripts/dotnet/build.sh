@@ -8,4 +8,4 @@ echo "Installing dependencies..."
 dotnet restore
 
 echo "Building..."
-CI=false dotnet build
+CI=false dotnet build -c Release
