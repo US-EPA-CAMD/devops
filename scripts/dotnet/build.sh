@@ -5,6 +5,7 @@ echo "---------- dotnet/build.sh -----------"
 echo "--------------------------------------"
 
 echo "Installing dependencies..."
+cd $1
 dotnet restore
 
 echo "Building..."
