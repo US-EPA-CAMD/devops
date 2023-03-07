@@ -4,9 +4,6 @@ echo "--------------------------------------"
 echo "---------- dotnet/build.sh -----------"
 echo "--------------------------------------"
 
-echo "Installing dependencies..."
+echo "Restoring dependencies, building, & publishing..."
 cd $1
-dotnet restore
-
-echo "Building..."
-CI=false dotnet build
+dotnet publish --configuration Release
