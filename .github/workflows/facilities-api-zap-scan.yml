@@ -2,18 +2,12 @@ name: "Facilities Mgmt API ZAP Scan"
 on: 
   workflow_dispatch:
   schedule:
-    - cron: '15 6 * * 6'
+    - cron: '*/5 * * * *'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
     name: Scan Facilities Mgmt API
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
-      - name: Configure Env Vars
-        run: scripts/environment-variables.sh          
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.1.1
         with:
@@ -28,5 +22,3 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
-
-          
