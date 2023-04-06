@@ -24,5 +24,7 @@ jobs:
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-facilities-api
         env:
+          AWS_DEFAULT_REGION: us-gov-west-1
+          ARTIFACTS_STORAGE: cg-85627a9c-7d48-446a-8cb7-5daa5c694169
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
