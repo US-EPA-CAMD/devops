@@ -1,5 +1,6 @@
 name: "Monitor Plan Mgmt API ZAP Scan"
 on:
+  workflow_dispatch:
   schedule:
     - cron: '25 6 * * 6'
 jobs:
@@ -8,13 +9,11 @@ jobs:
     name: Scan Monitor Plan Mgmt API
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: master
-      - name: Configure Env Vars
-        run: scripts/environment-variables.sh          
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.1.1
+        uses: zaproxy/action-api-scan@v0.2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           docker_name: 'owasp/zap2docker-stable'
@@ -25,7 +24,7 @@ jobs:
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-monitor-plan-api
         env:
+          AWS_DEFAULT_REGION: us-gov-west-1
+          ARTIFACTS_STORAGE: cg-85627a9c-7d48-446a-8cb7-5daa5c694169
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
-
-          
