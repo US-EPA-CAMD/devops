@@ -1,3 +1,6 @@
+# Change stack
+cf audit-stack --json | jq '.[] | select(.space == "dev") | select(.stack == "cflinuxfs3") | "cf target -o \(.org) -s \(.space) && cf change-stack \(.name) cflinuxfs4"' | xargs -i{} bash -c{}
+
 # create deployment account
 Windows
 cf create-service cloud-gov-service-account space-deployer deployment-svc

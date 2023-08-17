@@ -36,7 +36,10 @@ echo "--------------------------------"
 echo "-- environment secret ----------"
 echo "--------------------------------"
 
-./scripts/environment-variables-secrets.sh
+FILE=./scripts/environment-variables-secrets.sh
+if test -f "$FILE"; then
+  ./scripts/environment-variables-secrets.sh
+fi
 
 ../devops/scripts/deploy.sh
 
