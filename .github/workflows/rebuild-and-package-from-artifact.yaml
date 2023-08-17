@@ -26,8 +26,10 @@ jobs:
           scope: '@us-epa-camd'
       - name: Setup Env Variables
         run: |
-          name=${{ inputs.name.lowercase }}
-          version=${{ inputs.version.lowercase }}
+          name=${{ inputs.name }}
+          version=${{ inputs.version }}
+          name2=${{ github.event.inputs.name }}
+          version2=${{ github.event.inputs.version }}
           echo "APP_NAME=$name" >> $GITHUB_ENV
           echo "APP_VERSION=$version" >> $GITHUB_ENV
           echo "PACKAGE=$name.$version" >> $GITHUB_ENV
