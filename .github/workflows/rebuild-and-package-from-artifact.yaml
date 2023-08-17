@@ -27,23 +27,23 @@ jobs:
       - name: Setup Env Variables
         run: |
           echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
-          echo "APP_NAME=${{ inputs.name.lowercase }}" >> $GITHUB_ENV
-          echo "APP_VERSION=${{ inputs.version.lowercase }}" >> $GITHUB_ENV
+          echo "APP_NAME=${{ github.event.inputs.name.lowercase }}" >> $GITHUB_ENV
+          echo "APP_VERSION=${{ github.event.inputs.version.lowercase }}" >> $GITHUB_ENV
           echo "ARTIFACTS_STORAGE=cg-85627a9c-7d48-446a-8cb7-5daa5c694169" >> $GITHUB_ENV
-          echo "PACKAGE=${{ inputs.name.lowercase }}.${{ inputs.version.lowercase }}" >> $GITHUB_ENV
+          echo "PACKAGE=${{ github.event.inputs.name.lowercase }}.${{ github.event.inputs.version.lowercase }}" >> $GITHUB_ENV
       - name: Download Package
-        run: devops/scripts/download-artifact.sh
+        run: scripts/download-artifact.sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
       - name: Clean
         run: rm -rf dist/ node_modules/ npm-packages-offline-cache/ yarn.lock
       - name: Build
-        run: devops/scripts/yarn/build.sh
+        run: scripts/yarn/build.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Package App
-        run: devops/scripts/package-artifact.sh
+        run: scripts/package-artifact.sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_STORAGE_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_STORAGE_SECRET_ACCESS_KEY }}
