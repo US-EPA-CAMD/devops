@@ -26,11 +26,13 @@ jobs:
           scope: '@us-epa-camd'
       - name: Setup Env Variables
         run: |
+          export name=${{ github.event.inputs.name.lowercase }}
+          export version=${{ github.event.inputs.version.lowercase }}
+          echo "APP_NAME=$name" >> $GITHUB_ENV
+          echo "APP_VERSION=$version" >> $GITHUB_ENV
+          echo "PACKAGE=$name.$version" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=us-gov-west-1" >> $GITHUB_ENV
-          echo "APP_NAME=${{ github.event.inputs.name.lowercase }}" >> $GITHUB_ENV
-          echo "APP_VERSION=${{ github.event.inputs.version.lowercase }}" >> $GITHUB_ENV
           echo "ARTIFACTS_STORAGE=cg-85627a9c-7d48-446a-8cb7-5daa5c694169" >> $GITHUB_ENV
-          echo "PACKAGE=${{ github.event.inputs.name.lowercase }}.${{ github.event.inputs.version.lowercase }}" >> $GITHUB_ENV
       - name: Download Package
         run: scripts/download-artifact.sh
         env:
