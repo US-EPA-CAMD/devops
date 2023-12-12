@@ -1,5 +1,1 @@
-EASEY v1.3.112 facilities-api release/v1.3 
-EASEY v1.3.84 account-api release/v1.3 
-EASEY v1.3.116 emissions-api release/v1.3 
-EASEY v1.3.50 streaming-services release/v1.3 
-EASEY v1.3.127 campd-ui release/v1.3 
+REACT_APP_EASEY v1.3.129 campd-ui release/v1.3 
