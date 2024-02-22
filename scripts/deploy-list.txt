@@ -1,1 +1,1 @@
-REACT_APP_EASEY v1.3.131 campd-ui release/v1.3 
+EASEY_QUARTZ_SCHEDULER v1.3.89 quartz-scheduler release/v1.3 
