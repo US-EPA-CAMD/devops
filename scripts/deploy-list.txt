@@ -1,1 +1,4 @@
-EASEY_QUARTZ_SCHEDULER v1.3.89 quartz-scheduler release/v1.3 
+EASEY v1.4.120 facilities-api release/v1.4 
+EASEY v1.4.90 account-api release/v1.4 
+EASEY v1.4.58 streaming-services release/v1.4 
+REACT_APP_EASEY v1.4.137 campd-ui release/v1.4 
