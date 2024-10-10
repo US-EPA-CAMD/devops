@@ -21,7 +21,20 @@ jobs:
           rules_file_name: 'rules.tsv'
           format: 'openapi'
           target: 'https://api-easey-dev.app.cloud.gov/account-mgmt/swagger-json'
-          cmd_options: "-a -d -z \"-config replacer.full_list\\(0\\).description=auth1 -config replacer.full_list\\(0\\).enabled=true -config replacer.full_list\\(0\\).matchtype=REQ_HEADER -config replacer.full_list\\(0\\).matchstr=x-api-key -config replacer.full_list\\(0\\).regex=false -config replacer.full_list\\(0\\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}\""
+          cmd_options: >
+            -a -d -z "
+            -config replacer.full_list\(0\).description=auth1
+            -config replacer.full_list\(0\).enabled=true
+            -config replacer.full_list\(0\).matchtype=REQ_HEADER
+            -config replacer.full_list\(0\).matchstr=x-api-key
+            -config replacer.full_list\(0\).regex=false
+            -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+            -config api.activeScan=true
+            -config policies.policy\(0\).name=Default Policy
+            -config policies.policy\(0\).enabled=true
+            -config policies.policy\(0\).attackStrength=HIGH
+            -config policies.policy\(0\).alertThreshold=LOW
+            "
       - name: Package reports
         run: scripts/zap-api-scan.sh easey-account-api
         env:
