@@ -4,4 +4,5 @@
 # Note: this scan will take longer to complete and should therefore be run at off-peak times.
 
 def zap_active_scan(zap, target, policy):
-    return zap, target, 'St-High-Th-Low'
+    policy = 'St-High-Th-Low'
+    return zap, target, policy 
