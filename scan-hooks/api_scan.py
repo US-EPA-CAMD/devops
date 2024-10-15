@@ -6,6 +6,6 @@
 def zap_active_scan(zap, target, policy):
     # Log the incoming parameters
     print('Incoming policy: ' + str(policy))
-    policy = 'St-Ins-Th-Low'
+    policy = 'St-Ins-Th-Low.policy'
     print('Outgoing policy: ' + str(policy))
     return zap, target, policy
