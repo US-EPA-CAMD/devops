@@ -16,23 +16,26 @@ on:
                 type: choice
                 options: 
                     - 'Default Policy' 
+                    - 'St-Ins-Th-Low'
+                    - 'St-Ins-Th-Med'
+                    - 'St-Ins-Th-High'
                     - 'St-High-Th-Low'
-                    - 'St-High-Th-Medium'
+                    - 'St-High-Th-Med'
                     - 'St-High-Th-High'
                     - 'St-Medium-Th-Low'
-                    - 'St-Medium-Th-Medium'
+                    - 'St-Medium-Th-Med'
                     - 'St-Medium-Th-High'
                     - 'St-Low-Th-Low'
-                    - 'St-Low-Th-Medium'
+                    - 'St-Low-Th-Med'
                     - 'St-Low-Th-High'
-env:
-    ZAP_SCAN_POLICY: ${{ github.event.inputs.zapscanpolicy }}
 jobs:
     zap_scan:
         runs-on: ubuntu-latest
         steps:
         - name: Checkout code
           uses: actions/checkout@v4
+        - name: Replace '<<policy>>' in the api_scan.py file
+          run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
         - name: Run ZAP Scan
           uses: zaproxy/action-full-scan@v0.11.0
           with:
