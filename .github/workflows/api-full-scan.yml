@@ -5,11 +5,11 @@ on:
             openapiurl:
                 description: 'The OpenAPI swagger json to import'
                 required: true
-                default: 'https://api.epa.gov/easey/dev/master-data-mgmt/swagger-json'
+                default: 'https://api.epa.gov/easey/staging/emissions-mgmt/swagger-json'
             openapitargeturl:
                 description: 'The OpenAPI target url to scan'
                 required: true
-                default: 'https://api.epa.gov/easey/dev/master-data-mgmt/'
+                default: 'https://api.epa.gov/easey/staging/'
             zapscanpolicy:
                 description: 'The ZAP scan policy to use'
                 required: true
