@@ -39,7 +39,7 @@ jobs:
         - name: Echo target
           run: echo ${{ github.event.inputs.openapitargeturl }}
         - name: Echo policy
-          run: echo ${{ github.event.inputs.policy }}
+          run: echo ${{ github.event.inputs.zapscanpolicy }}
         - name: Replace '<<policy>>' in the api_scan.py file
           run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
         - name: Run ZAP Scan
