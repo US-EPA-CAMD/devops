@@ -34,6 +34,10 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v4
+        - name: Echo parameters
+          run: echo "Swagger URL: ${{ github.event.inputs.openapiurl }}"
+          run: echo "Target URL: ${{github.event.inputs.openapitargeturl}}"
+          run: echo "Policy:${{ github.event.inputs.zapscanpolicy }}"
         - name: Replace '<<policy>>' in the api_scan.py file
           run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
         - name: Run ZAP Scan
