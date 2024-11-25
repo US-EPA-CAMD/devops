@@ -1,0 +1,111 @@
+name: "API Full ZAP Scan with Authentication"
+
+on:
+  workflow_dispatch:
+    inputs:
+      openapiurl:
+        description: 'The OpenAPI swagger JSON to import'
+        required: true
+        default: 'https://api.epa.gov/easey/perf/emissions-mgmt/swagger-json'
+      openapitargeturl:
+        description: 'The OpenAPI target URL to scan'
+        required: true
+        default: 'https://api.epa.gov/easey/perf/'
+      zapscanpolicy:
+        description: 'The ZAP scan policy to use'
+        required: true
+        type: choice
+        options:
+          - 'Default Policy'
+          - 'St-Ins-Th-Low'
+          - 'St-Ins-Th-Med'
+          - 'St-Ins-Th-High'
+          - 'St-High-Th-Low'
+          - 'St-High-Th-Med'
+          - 'St-High-Th-High'
+          - 'St-Medium-Th-Low'
+          - 'St-Medium-Th-Med'
+          - 'St-Medium-Th-High'
+          - 'St-Low-Th-Low'
+          - 'St-Low-Th-Med'
+          - 'St-Low-Th-High'
+
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Echo Input Parameters
+        run: |
+          echo "OpenAPI URL: ${{ github.event.inputs.openapiurl }}"
+          echo "Target URL: ${{ github.event.inputs.openapitargeturl }}"
+          echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
+
+      - name: Replace '<<policy>>' in the api_scan.py file
+        run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
+
+      # Step to obtain the authentication token
+      - name: Obtain Authentication Token
+        id: get_auth_token
+        env:
+          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+          SCAN_USER_ID: ${{ secrets.SCAN_USER_ID }}
+        run: |
+          curl -s -X POST \
+            "${{ github.event.inputs.openapitargeturl }}auth-mgmt/sign-in" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: $X_API_KEY" \
+            -d "{\"sessionId\": \"${SCAN_USER_ID:-scanUser1}\"}" \
+            -o auth_response.json
+
+          AUTH_TOKEN=$(jq -r '.token' auth_response.json)
+          echo "AUTH_TOKEN=${AUTH_TOKEN}" >> $GITHUB_ENV
+
+      # Step to obtain the client token
+      - name: Obtain Client Token
+        id: get_client_token
+        env:
+          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+          SCAN_CLIENT_ID: ${{ secrets.SCAN_CLIENT_ID }}
+          SCAN_CLIENT_SECRET: ${{ secrets.SCAN_CLIENT_SECRET }}
+        run: |
+          curl -s -X POST \
+            "${{ github.event.inputs.openapitargeturl }}auth-mgmt/tokens/client" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: $X_API_KEY" \
+            -d "{\"clientId\": \"${SCAN_CLIENT_ID}\", \"clientSecret\": \"${SCAN_CLIENT_SECRET}\"}" \
+            -o client_response.json
+
+          CLIENT_TOKEN=$(jq -r '.token' client_response.json)
+          echo "CLIENT_TOKEN=${CLIENT_TOKEN}" >> $GITHUB_ENV
+
+      # Step to download the OpenAPI spec
+      - name: Download OpenAPI Spec
+        run: |
+          curl -s -o openapi-spec.json "${{ github.event.inputs.openapiurl }}"
+
+      - name: Run ZAP Scan
+        uses: zaproxy/action-full-scan@v0.11.0
+        env:
+          AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
+          CLIENT_TOKEN: ${{ env.CLIENT_TOKEN }}
+          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+          SCAN_CLIENT_ID: ${{ secrets.SCAN_CLIENT_ID }}
+          OPENAPI_SPEC_PATH: '/zap/wrk/openapi-spec.json'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: ${{ github.event.inputs.openapitargeturl }}
+          docker_name: 'ghcr.io/zaproxy/zaproxy:latest'
+          allow_issue_writing: 'false'
+          rules_file_name: 'rules-api.tsv'
+          cmd_options: >
+            -a -d
+            --hook=scan-hooks/api_scan.py
+            -script scripts/zap-auth_per_endpoint.js
+            -z "
+            -addoninstall openapi
+            -openapiurl ${{ github.event.inputs.openapiurl }}
+            -openapitargeturl ${{ github.event.inputs.openapitargeturl }}
+            "
