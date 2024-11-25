@@ -103,7 +103,7 @@ jobs:
           cmd_options: >
             -a -d
             --hook=scan-hooks/api_scan.py
-            -script scripts/auth_per_endpoint.js
+            -script scripts/zap-auth-per-endpoint.js
             -c rules-api.tsv
             -z "
             -addoninstall openapi
