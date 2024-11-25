@@ -87,7 +87,7 @@ jobs:
           curl -s -o openapi-spec.json "${{ github.event.inputs.openapiurl }}"
 
       - name: Run ZAP Scan
-        uses: zaproxy/action-full-scan@v0.11.0
+        uses: zaproxy/action-full-scan@v0.12.0
         env:
           AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
           CLIENT_TOKEN: ${{ env.CLIENT_TOKEN }}
