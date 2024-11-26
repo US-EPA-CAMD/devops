@@ -1,4 +1,4 @@
-name: "API Full ZAP Scan with Authentication"
+name: "API Security Scan with Selectable Token"
 
 on:
   workflow_dispatch:
@@ -29,6 +29,13 @@ on:
           - 'St-Low-Th-Low'
           - 'St-Low-Th-Med'
           - 'St-Low-Th-High'
+      token_type:
+        description: 'Select the token type for the scan (AUTH_TOKEN or CLIENT_TOKEN)'
+        required: true
+        type: choice
+        options:
+          - 'AUTH_TOKEN'
+          - 'CLIENT_TOKEN'
 
 jobs:
   zap_scan:
@@ -44,6 +51,7 @@ jobs:
           echo "OpenAPI URL: ${{ github.event.inputs.openapiurl }}"
           echo "Target URL: ${{ github.event.inputs.openapitargeturl }}"
           echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
+          echo "Token Type: ${{ github.event.inputs.token_type }}"
 
       # 3. Replace '<<policy>>' in the api_scan.py File
       - name: Replace '<<policy>>' in the api_scan.py file
@@ -65,6 +73,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "x-api-key: $X_API_KEY" \
             -d "{\"sessionId\": \"${SCAN_USER_ID:-scanUser1}\"}")
+
           AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.token')
           echo "AUTH_TOKEN=$AUTH_TOKEN" >> $GITHUB_ENV
 
@@ -81,27 +90,46 @@ jobs:
             -H "Content-Type: application/json" \
             -H "x-api-key: $X_API_KEY" \
             -d "{\"clientId\": \"${SCAN_CLIENT_ID}\", \"clientSecret\": \"${SCAN_CLIENT_SECRET}\"}")
+
           CLIENT_TOKEN=$(echo "$CLIENT_RESPONSE" | jq -r '.token')
           echo "CLIENT_TOKEN=$CLIENT_TOKEN" >> $GITHUB_ENV
 
-      # 7. Download OpenAPI Spec
-      - name: Download OpenAPI Spec
-        run: |
-          curl -s -o openapi-spec.json "${{ github.event.inputs.openapiurl }}"
-
-      # 8. Run ZAP Scan with Custom Script
+      # 7. Run ZAP Scan
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         env:
-          AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
-          CLIENT_TOKEN: ${{ env.CLIENT_TOKEN }}
+          SELECTED_TOKEN: ${{ github.event.inputs.token_type == 'AUTH_TOKEN' && env.AUTH_TOKEN || env.CLIENT_TOKEN }}
           X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
           SCAN_CLIENT_ID: ${{ secrets.SCAN_CLIENT_ID }}
-          OPENAPI_SPEC_PATH: '/zap/wrk/openapi-spec.json'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ github.event.inputs.openapitargeturl }}
           docker_name: 'ghcr.io/zaproxy/zaproxy:latest'
           allow_issue_writing: 'false'
           rules_file_name: 'rules-api.tsv'
-          cmd_options: "-a -d --hook=scan-hooks/api_scan.py -z \"-addoninstall openapi -openapiurl /zap/wrk/openapi-spec.json -openapitargeturl ${{ github.event.inputs.openapitargeturl }} -config script.scripts.name=zap-auth-per-endpoint -config script.scripts.type=httpsender -config script.scripts.engine='Oracle Nashorn' -config script.scripts.file=scripts/zap-auth-per-endpoint.js -config script.scripts.enabled=true\""
+          cmd_options: >
+            -a -d
+            --hook=scan-hooks/api_scan.py
+            -z "
+            -addoninstall openapi
+            -openapiurl ${{ github.event.inputs.openapiurl }}
+            -openapitargeturl ${{ github.event.inputs.openapitargeturl }}
+            -config replacer.full_list\(0\).description=x-api-key
+            -config replacer.full_list\(0\).enabled=true
+            -config replacer.full_list\(0\).matchtype=REQ_HEADER
+            -config replacer.full_list\(0\).matchstr=x-api-key
+            -config replacer.full_list\(0\).regex=false
+            -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+            -config replacer.full_list\(1\).description=Authorization
+            -config replacer.full_list\(1\).enabled=true
+            -config replacer.full_list\(1\).matchtype=REQ_HEADER
+            -config replacer.full_list\(1\).matchstr=Authorization
+            -config replacer.full_list\(1\).regex=false
+            -config replacer.full_list\(1\).replacement=Bearer $SELECTED_TOKEN
+            -config replacer.full_list\(2\).description=x-client-id
+            -config replacer.full_list\(2\).enabled=true
+            -config replacer.full_list\(2\).matchtype=REQ_HEADER
+            -config replacer.full_list\(2\).matchstr=x-client-id
+            -config replacer.full_list\(2\).regex=false
+            -config replacer.full_list\(2\).replacement=${{ secrets.SCAN_CLIENT_ID }}
+            "
