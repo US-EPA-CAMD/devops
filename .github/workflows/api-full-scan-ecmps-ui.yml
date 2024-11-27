@@ -61,11 +61,7 @@ jobs:
       - name: Replace '<<policy>>' in the api_scan.py file
         run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
 
-      # 5. Install jq
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      # 6. Run ZAP Scan
+      # 5. Run ZAP Scan
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         env:
@@ -86,6 +82,4 @@ jobs:
             -config replacer.full_list\(0\).matchstr=x-api-key
             -config replacer.full_list\(0\).regex=false
             -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
-            -config ajaxSpider.maxDuration=300
-            -config spider.maxDepth=5
             "
