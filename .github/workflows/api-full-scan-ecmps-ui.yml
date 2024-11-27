@@ -28,6 +28,13 @@ on:
           - 'St-Low-Th-Low'
           - 'St-Low-Th-Med'
           - 'St-Low-Th-High'
+      scanType:
+        description: 'Select the type of scan to perform (activeScan or passiveScan)'
+        required: true
+        type: choice
+        options:
+          - 'activeScan'
+          - 'passiveScan'
 
 jobs:
   zap_scan:
@@ -55,35 +62,47 @@ jobs:
           echo "Original App URL: ${{ github.event.inputs.appurl }}"
           echo "Updated App URL: ${{ env.UPDATED_URL }}"
           echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
+          echo "Scan Type: ${{ github.event.inputs.scanType }}"
           echo "UserID: ${{ env.USER_ID }}"
 
-      # 4. Replace '<<policy>>' in the api_scan.py File
-      - name: Replace '<<policy>>' in the api_scan.py file
-        run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
+      # 4. Configure and Run ZAP Automation Plan
+      - name: Create Automation Plan
+        run: |
+          cat <<EOT >> automation-plan.yaml
+          env:
+            - name: api.key
+              value: "${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"
+          jobs:
+            - type: replacer
+              parameters:
+                - description: x-api-key
+                  enabled: true
+                  matchtype: REQ_HEADER
+                  matchstr: x-api-key
+                  regex: false
+                  replacement: "${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"
+            - type: spider
+              parameters:
+                url: "${{ env.UPDATED_URL }}"
+                maxChildren: 10
+                recurse: true
+                subtreeOnly: false
+            - type: spiderAjax
+              parameters:
+                url: "${{ env.UPDATED_URL }}"
+                inScopeOnly: true
+                maxDuration: 3600
+            - type: ${{ github.event.inputs.scanType }}
+              parameters:
+                policy: "${{ github.event.inputs.zapscanpolicy }}"
+          EOT
 
-      # 5. Run ZAP Scan
-      - name: Run ZAP Scan with AJAX Spider
+      - name: Run ZAP Scan with Automation Plan
         uses: zaproxy/action-full-scan@v0.12.0
-        env:
-          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ env.UPDATED_URL }}
           docker_name: 'ghcr.io/zaproxy/zaproxy:latest'
           allow_issue_writing: 'false'
-          rules_file_name: 'rules.tsv'
-          cmd_options: >
-            -a -d -j 
-            --hook=scan-hooks/api_scan.py
-            -z "
-            -config replacer.full_list\(0\).description=x-api-key
-            -config replacer.full_list\(0\).enabled=true
-            -config replacer.full_list\(0\).matchtype=REQ_HEADER
-            -config replacer.full_list\(0\).matchstr=x-api-key
-            -config replacer.full_list\(0\).regex=false
-            -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
-            -config ajaxSpider.maxDuration=3600
-            -config ajaxSpider.browserId=0
-            -config ajaxSpider.clickDefaultElems=true
-            -config spider.maxDepth=5
-            "
+        env:
+          ZAP_AUTOMATION_FILE: automation-plan.yaml
