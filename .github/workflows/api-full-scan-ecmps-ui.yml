@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       appurl:
-        description: 'The home page URL of the React app'
+        description: 'The home page URL of the React app (unauthenticated URL)'
         required: true
         default: 'https://ecmps-perf.app.cloud.gov/'
       userID:
-        description: 'The user ID for login (optional, defaults to GitHub secret).CDX Bypass must be ON'
+        description: 'The user ID for login (optional, defaults to GitHub secret). CDX Bypass must be ON'
         required: false
       zapscanpolicy:
         description: 'The ZAP scan policy to use'
@@ -28,6 +28,13 @@ on:
           - 'St-Low-Th-Low'
           - 'St-Low-Th-Med'
           - 'St-Low-Th-High'
+      scanType:
+        description: 'Select the type of scan to perform (activeScan or passiveScan)'
+        required: true
+        type: choice
+        options:
+          - 'activeScan'
+          - 'passiveScan'
 
 jobs:
   zap_scan:
@@ -37,80 +44,65 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Determine UserID
-      - name: Determine UserID
+      # 2. Determine UserID and Update URL
+      - name: Determine UserID and Update App URL
         id: determine_userid
         run: |
           if [ -n "${{ github.event.inputs.userID }}" ]; then
             echo "USER_ID=${{ github.event.inputs.userID }}" >> $GITHUB_ENV
+            echo "UPDATED_URL=${{ github.event.inputs.appurl }}?sessionId=${{ github.event.inputs.userID }}" >> $GITHUB_ENV
           else
             echo "USER_ID=${{ secrets.SCAN_USER_ID }}" >> $GITHUB_ENV
+            echo "UPDATED_URL=${{ github.event.inputs.appurl }}?sessionId=${{ secrets.SCAN_USER_ID }}" >> $GITHUB_ENV
           fi
 
-      # 3. Construct Login URL
-      - name: Construct Login URL
-        id: construct_login_url
-        run: echo "LOGIN_URL=${{ github.event.inputs.appurl }}?sessionId=${{ env.USER_ID }}" >> $GITHUB_ENV
-
-      # 4. Echo Input Parameters
+      # 3. Echo Input Parameters
       - name: Echo Input Parameters
         run: |
-          echo "App URL: ${{ github.event.inputs.appurl }}"
-          echo "Login URL: ${{ env.LOGIN_URL }}"
+          echo "Original App URL: ${{ github.event.inputs.appurl }}"
+          echo "Updated App URL: ${{ env.UPDATED_URL }}"
           echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
+          echo "Scan Type: ${{ github.event.inputs.scanType }}"
           echo "UserID: ${{ env.USER_ID }}"
 
-      # 5. Replace '<<policy>>' in the api_scan.py File
-      - name: Replace '<<policy>>' in the api_scan.py file
-        run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
-
-      # 6. Install jq
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      # 7. Obtain Authentication Token
-      - name: Obtain Authentication Token
-        id: get_auth_token
-        env:
-          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+      # 4. Configure and Run ZAP Automation Plan
+      - name: Create Automation Plan
         run: |
-          AUTH_RESPONSE=$(curl -s -X POST \
-            "${{ env.LOGIN_URL }}" \
-            -H "Content-Type: application/json" \
-            -H "x-api-key: $X_API_KEY" \
-            -d "{\"sessionId\": \"${{ env.USER_ID }}\"}")
+          cat <<EOT >> automation-plan.yaml
+          env:
+            - name: api.key
+              value: "${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"
+          jobs:
+            - type: replacer
+              parameters:
+                - description: x-api-key
+                  enabled: true
+                  matchtype: REQ_HEADER
+                  matchstr: x-api-key
+                  regex: false
+                  replacement: "${{ secrets.OWASP_ZAP_SCAN_API_KEY }}"
+            - type: spider
+              parameters:
+                url: "${{ env.UPDATED_URL }}"
+                maxChildren: 10
+                recurse: true
+                subtreeOnly: false
+            - type: spiderAjax
+              parameters:
+                url: "${{ env.UPDATED_URL }}"
+                inScopeOnly: true
+                maxDuration: 3600
+            - type: ${{ github.event.inputs.scanType }}
+              parameters:
+                policy: "${{ github.event.inputs.zapscanpolicy }}"
+          EOT
 
-          AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.token')
-          echo "AUTH_TOKEN=$AUTH_TOKEN" >> $GITHUB_ENV
-
-      # 8. Run ZAP Scan
-      - name: Run ZAP Scan
+      - name: Run ZAP Scan with Automation Plan
         uses: zaproxy/action-full-scan@v0.12.0
-        env:
-          AUTH_TOKEN: ${{ env.AUTH_TOKEN }}
-          X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ github.event.inputs.appurl }}
+          target: ${{ env.UPDATED_URL }}
           docker_name: 'ghcr.io/zaproxy/zaproxy:latest'
           allow_issue_writing: 'false'
-          rules_file_name: 'rules.tsv'
-          cmd_options: >
-            -a -d
-            --hook=scan-hooks/api_scan.py
-            -z "
-            -config replacer.full_list\(0\).description=x-api-key
-            -config replacer.full_list\(0\).enabled=true
-            -config replacer.full_list\(0\).matchtype=REQ_HEADER
-            -config replacer.full_list\(0\).matchstr=x-api-key
-            -config replacer.full_list\(0\).regex=false
-            -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
-            -config replacer.full_list\(1\).description=Authorization
-            -config replacer.full_list\(1\).enabled=true
-            -config replacer.full_list\(1\).matchtype=REQ_HEADER
-            -config replacer.full_list\(1\).matchstr=Authorization
-            -config replacer.full_list\(1\).regex=false
-            -config replacer.full_list\(1\).replacement=Bearer $AUTH_TOKEN
-            -config ajaxSpider.maxDuration=300
-            -config spider.maxDepth=5
-            "
+        env:
+          ZAP_AUTOMATION_FILE: automation-plan.yaml
