@@ -62,7 +62,7 @@ jobs:
         run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
 
       # 5. Run ZAP Scan
-      - name: Run ZAP Scan
+      - name: Run ZAP Scan with AJAX Spider
         uses: zaproxy/action-full-scan@v0.12.0
         env:
           X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
@@ -82,4 +82,8 @@ jobs:
             -config replacer.full_list\(0\).matchstr=x-api-key
             -config replacer.full_list\(0\).regex=false
             -config replacer.full_list\(0\).replacement=${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
+            -config ajaxSpider.maxDuration=3600
+            -config ajaxSpider.browserId=0
+            -config ajaxSpider.clickDefaultElems=true
+            -config spider.maxDepth=5
             "
