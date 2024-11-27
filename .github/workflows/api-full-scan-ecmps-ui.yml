@@ -73,7 +73,7 @@ jobs:
           allow_issue_writing: 'false'
           rules_file_name: 'rules.tsv'
           cmd_options: >
-            -a -d
+            -a -d -j 
             --hook=scan-hooks/api_scan.py
             -z "
             -config replacer.full_list\(0\).description=x-api-key
