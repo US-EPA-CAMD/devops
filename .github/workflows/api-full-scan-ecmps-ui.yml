@@ -8,8 +8,12 @@ on:
         required: true
         default: 'https://ecmps-perf.app.cloud.gov/'
       userID:
-        description: 'The user ID for login (optional, defaults to GitHub secret).CDX Bypass must be ON'
+        description: 'The user ID for login (optional, defaults to GitHub secret). CDX Bypass must be ON'
         required: false
+      authurl:
+        description: 'The authentication URL for obtaining tokens'
+        required: true
+        default: 'https://api.epa.gov/easey/perf/auth-mgmt/sign-in'
       zapscanpolicy:
         description: 'The ZAP scan policy to use'
         required: true
@@ -47,35 +51,30 @@ jobs:
             echo "USER_ID=${{ secrets.SCAN_USER_ID }}" >> $GITHUB_ENV
           fi
 
-      # 3. Construct Login URL
-      - name: Construct Login URL
-        id: construct_login_url
-        run: echo "LOGIN_URL=${{ github.event.inputs.appurl }}?sessionId=${{ env.USER_ID }}" >> $GITHUB_ENV
-
-      # 4. Echo Input Parameters
+      # 3. Echo Input Parameters
       - name: Echo Input Parameters
         run: |
           echo "App URL: ${{ github.event.inputs.appurl }}"
-          echo "Login URL: ${{ env.LOGIN_URL }}"
+          echo "Auth URL: ${{ github.event.inputs.authurl }}"
           echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
           echo "UserID: ${{ env.USER_ID }}"
 
-      # 5. Replace '<<policy>>' in the api_scan.py File
+      # 4. Replace '<<policy>>' in the api_scan.py File
       - name: Replace '<<policy>>' in the api_scan.py file
         run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
 
-      # 6. Install jq
+      # 5. Install jq
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      # 7. Obtain Authentication Token
+      # 6. Obtain Authentication Token
       - name: Obtain Authentication Token
         id: get_auth_token
         env:
           X_API_KEY: ${{ secrets.OWASP_ZAP_SCAN_API_KEY }}
         run: |
           AUTH_RESPONSE=$(curl -s -X POST \
-            "${{ env.LOGIN_URL }}" \
+            "${{ github.event.inputs.authurl }}" \
             -H "Content-Type: application/json" \
             -H "x-api-key: $X_API_KEY" \
             -d "{\"sessionId\": \"${{ env.USER_ID }}\"}")
@@ -83,7 +82,7 @@ jobs:
           AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.token')
           echo "AUTH_TOKEN=$AUTH_TOKEN" >> $GITHUB_ENV
 
-      # 8. Run ZAP Scan
+      # 7. Run ZAP Scan
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         env:
