@@ -1,8 +1,20 @@
 name: "ECMPS UI Full ZAP Scan with Authentication"
 
+# This workflow is experimental and is not functioning as intended.
+# IMPORTANT NOTE:
+# 1. This workflow is designed to scan React-based web applications using both standard and AJAX spiders.
+# 2. The following known issues prevent this workflow from working as intended:
+#    - The `replacer` functionality intended to dynamically insert the `x-api-key` header does not seem to work. Needs further investigation.
+#    - While the standard spider works, the `spiderAjax` job, designed to handle modern web applications, does not seem to get invoked as expected.
+# 3. This workflow attempts to dynamically generate the target URL based on user inputs or GitHub secrets and create an automation plan for ZAP.
+
 on:
   workflow_dispatch:
     inputs:
+      confirmUsage:
+        description: "WARNING: This workflow is experimental and has known issues. Review the developer comments and confirm if you want to proceed. (yes/no)"
+        required: true
+        default: "no"
       appurl:
         description: 'The home page URL of the React app (unauthenticated URL)'
         required: true
@@ -40,11 +52,28 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout Code
+      # 1. Display Warning and Confirm Usage
+      - name: Confirm Workflow Usage
+        run: |
+          echo "WARNING: This workflow is experimental and may not function as intended."
+          echo "KNOWN ISSUES:"
+          echo "1. The replacer functionality for setting the API key (x-api-key) does not work as intended."
+          echo "2. The standard spider appears to work, but the spiderAjax job intended for scanning modern web applications does not seem to get invoked."
+          echo "DEVELOPER COMMENTS:"
+          echo "This workflow attempts to scan modern React-based web applications using both standard and AJAX spiders."
+          echo "The replacer job is supposed to dynamically add the x-api-key to requests."
+          echo "The spiderAjax job is designed to interact with JavaScript-heavy pages, but it does not currently perform as expected."
+          if [ "${{ github.event.inputs.confirmUsage }}" != "yes" ]; then
+            echo "Exiting workflow as confirmation was not provided."
+            exit 1
+          fi
+          echo "Proceeding with the workflow as confirmation was provided."
+
+      # 2. Checkout Code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Determine UserID and Update URL
+      # 3. Determine UserID and Update URL
       - name: Determine UserID and Update App URL
         id: determine_userid
         run: |
@@ -56,7 +85,7 @@ jobs:
             echo "UPDATED_URL=${{ github.event.inputs.appurl }}?sessionId=${{ secrets.SCAN_USER_ID }}" >> $GITHUB_ENV
           fi
 
-      # 3. Echo Input Parameters
+      # 4. Echo Input Parameters
       - name: Echo Input Parameters
         run: |
           echo "Original App URL: ${{ github.event.inputs.appurl }}"
@@ -65,7 +94,7 @@ jobs:
           echo "Scan Type: ${{ github.event.inputs.scanType }}"
           echo "UserID: ${{ env.USER_ID }}"
 
-      # 4. Configure and Run ZAP Automation Plan
+      # 5. Configure and Run ZAP Automation Plan
       - name: Create Automation Plan
         run: |
           cat <<EOT >> automation-plan.yaml

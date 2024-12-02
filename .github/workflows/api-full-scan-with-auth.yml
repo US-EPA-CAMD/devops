@@ -1,8 +1,30 @@
 name: "API Full ZAP Scan with Authentication"
 
+# This workflow is experimental and is not functioning as intended.
+# IMPORTANT NOTE:
+# 1. This workflow uses the `zap-auth-per-endpoint.js` script to dynamically determine the correct token
+#    (either `auth_token` or `client_token`) based on the Swagger JSON specification for each endpoint.
+# 2. The script reads the OpenAPI spec, analyzes the security requirements for each endpoint, and sets the
+#    appropriate authentication headers for scanning:
+#    - If an endpoint requires `auth_token`, it sets the `Authorization` header to "Bearer AUTH_TOKEN".
+#    - If an endpoint requires `client_token`, it sets the `Authorization` header to "Bearer CLIENT_TOKEN" and
+#      includes an additional `x-client-id` header.
+#    - If no token is required, it omits the `Authorization` header.
+# 3. The intended functionality of this workflow is to improve upon the "API Security Scan with Selectable Token"
+#    workflow by automating the token selection process for each endpoint.
+# 4. However, this workflow currently does not work as intended because:
+#    - The `zap-auth-per-endpoint.js` script is not being successfully invoked or integrated during the scan.
+#    - This results in incorrect or missing authentication headers, causing the scan to fail for authenticated endpoints.
+# 5. Please exercise caution and review the workflow before proceeding.
+
+
 on:
   workflow_dispatch:
     inputs:
+      confirmUsage:
+        description: 'WARNING: This workflow is experimental and has known issues. Review the developer comments and confirm if you want to proceed. (yes/no)'
+        required: true
+        default: 'no'
       openapiurl:
         description: 'The OpenAPI Swagger JSON to import'
         required: true
@@ -34,26 +56,37 @@ jobs:
   zap_scan:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout Code
+      # 1. Display Warning and Confirm Usage
+      - name: Confirm Workflow Usage
+        run: |
+          echo "WARNING: This workflow is experimental and may not function as intended."
+          echo "Developer Note: Review the workflow configuration and ensure all steps align with your project requirements before proceeding."
+          if [ "${{ github.event.inputs.confirmUsage }}" != "yes" ]; then
+            echo "Exiting workflow as confirmation was not provided."
+            exit 1
+          fi
+          echo "Proceeding with the workflow as confirmation was provided."
+
+      # 2. Checkout Code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Echo Input Parameters
+      # 3. Echo Input Parameters
       - name: Echo Input Parameters
         run: |
           echo "OpenAPI URL: ${{ github.event.inputs.openapiurl }}"
           echo "Target URL: ${{ github.event.inputs.openapitargeturl }}"
           echo "Scan Policy: ${{ github.event.inputs.zapscanpolicy }}"
 
-      # 3. Replace '<<policy>>' in the api_scan.py File
+      # 4. Replace '<<policy>>' in the api_scan.py File
       - name: Replace '<<policy>>' in the api_scan.py file
         run: sed -i "s/<<policy>>/${{ github.event.inputs.zapscanpolicy }}/g" scan-hooks/api_scan.py
 
-      # 4. Install jq
+      # 5. Install jq
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      # 5. Obtain Authentication Token
+      # 6. Obtain Authentication Token
       - name: Obtain Authentication Token
         id: get_auth_token
         env:
@@ -68,7 +101,7 @@ jobs:
           AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.token')
           echo "AUTH_TOKEN=$AUTH_TOKEN" >> $GITHUB_ENV
 
-      # 6. Obtain Client Token
+      # 7. Obtain Client Token
       - name: Obtain Client Token
         id: get_client_token
         env:
@@ -84,12 +117,12 @@ jobs:
           CLIENT_TOKEN=$(echo "$CLIENT_RESPONSE" | jq -r '.token')
           echo "CLIENT_TOKEN=$CLIENT_TOKEN" >> $GITHUB_ENV
 
-      # 7. Download OpenAPI Spec
+      # 8. Download OpenAPI Spec
       - name: Download OpenAPI Spec
         run: |
           curl -s -o openapi-spec.json "${{ github.event.inputs.openapiurl }}"
 
-      # 8. Run ZAP Scan with Custom Script
+      # 9. Run ZAP Scan with Custom Script
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         env:
