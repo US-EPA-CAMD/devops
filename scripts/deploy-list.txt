@@ -6,4 +6,3 @@ EASEY v1.3.102 auth-api release/v1.5
 EASEY v1.3.133 emissions-api release/v1.5
 EASEY v1.3.76 mdm-api release/v1.5
 REACT_APP_EASEY v1.4.141 campd-ui release/v1.5
-
