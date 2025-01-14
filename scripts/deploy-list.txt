@@ -1,9 +1,9 @@
-EASEY v1.4.126 facilities-api release/v1.5 
-EASEY v1.4.98 account-api release/v1.5 
-EASEY v1.4.69 streaming-services release/v1.5 
-EASEY v1.3.102 camd-services release/v1.5 
-EASEY v1.3.102 auth-api release/v1.5 
-EASEY v1.3.133 emissions-api release/v1.5 
-EASEY v1.3.76 mdm-api release/v1.5 
-REACT_APP_EASEY v1.4.141 campd-ui release/v1.5 
+EASEY v1.6.131 facilities-api release/v1.6 
+EASEY v1.6.103 account-api release/v1.6 
+EASEY v1.6.81 mdm-api release/v1.6 
+EASEY v1.6.139 emissions-api release/v1.6 
+EASEY v1.6.107 auth-api release/v1.6 
+EASEY v1.6.109 camd-services release/v1.6 
+EASEY v1.6.75 streaming-services release/v1.6 
+REACT_APP_EASEY v1.6.143 campd-ui release/v1.6 
 
