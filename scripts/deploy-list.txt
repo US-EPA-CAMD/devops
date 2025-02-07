@@ -1,3 +1,4 @@
+EASEY v1.1.17 ssh-tunnel release/v1.0 
 EASEY v1.6.131 facilities-api release/v1.6 
 EASEY v1.6.103 account-api release/v1.6 
 EASEY v1.6.81 mdm-api release/v1.6 
