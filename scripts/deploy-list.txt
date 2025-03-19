@@ -1,2 +1,2 @@
-REACT_APP_EASEY v1.7.146 campd-ui release/v1.7 
+REACT_APP_EASEY v1.6.143 campd-ui release/v1.6 
 
