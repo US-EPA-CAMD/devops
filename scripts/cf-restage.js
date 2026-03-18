@@ -36,6 +36,7 @@
  */
 
 const { execFileSync } = require('child_process');
+const readline = require('readline');
 
 const ORG = 'epa-easey';
 const VALID_SPACES = ['dev', 'test', 'perf', 'staging', 'beta', 'prod'];
@@ -110,6 +111,36 @@ function runCfJson(args) {
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function confirmProdAction({ space, statusOnly, mode, appList }) {
+  return new Promise((resolve) => {
+    warn('');
+    warn('  *** WARNING: You are about to perform an action on PROD ***');
+    warn('');
+    warn('  Space:   ' + space);
+    warn('  Action:  restage');
+
+    if (mode === 'include') {
+      warn('  Include: ' + appList.join(', '));
+    } else if (mode === 'exclude') {
+      warn('  Exclude: ' + appList.join(', '));
+    } else {
+      warn('  Apps:    all');
+    }
+
+    warn('');
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    rl.question(YELLOW + '  Proceed? (y/N): ' + RESET, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === 'y');
+    });
+  });
 }
 
 function ensureLoggedIn() {
@@ -392,6 +423,15 @@ async function restageAppsSequentially(apps) {
 async function main() {
   try {
     const { space, statusOnly, mode, appList } = parseArgs(process.argv.slice(2));
+
+    if (space === 'prod' && !statusOnly) {
+      const confirmed = await confirmProdAction({ space, statusOnly, mode, appList });
+
+      if (!confirmed) {
+        warn('Aborted by user.');
+        process.exit(0);
+      }
+    }
 
     ensureLoggedIn();
     targetSpace(space);
