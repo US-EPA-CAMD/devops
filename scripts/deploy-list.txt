@@ -1,2 +1,1 @@
-REACT_APP_EASEY v1.7.148 campd-ui release/v1.7 
-
+VITE_EASEY v2.0.132 ecmps-ui release/v2.0 
