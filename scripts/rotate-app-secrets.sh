@@ -11,8 +11,8 @@ set -eo pipefail
 #
 # How it works:
 #   1. Sources the provided secrets file to load all variables.
-#   2. For each app, sources its repo's scripts/environment-variables-secrets.sh
-#      which runs cf set-env to apply the secrets.
+#   2. For each app, parses its repo's scripts/environment-variables-secrets.sh
+#      and runs cf set-env for each variable found.
 #   3. For non-prod spaces, also updates GitHub Actions secrets
 #      (per-environment) so CI/CD deployments stay in sync.
 #   4. Restages all modified apps one at a time.
@@ -29,9 +29,8 @@ set -eo pipefail
 #   <cf-space>      Cloud Foundry space (dev, test, perf, beta, staging, prod)
 #
 # Options:
-#   --test <vars>        Only rotate the specified comma-separated secrets.txt
-#                        variables. Spaces around commas are allowed.
 #   --skip-gh-secrets    Skip updating GitHub secrets (non-prod only).
+#   --skip-missing       Skip variables not found in the secrets file instead of failing.
 #
 # Environment variables:
 #   EASEY_APPS_LOCAL_REPO_ROOT  Override the root directory where all easey-*
@@ -40,9 +39,8 @@ set -eo pipefail
 #
 # Examples:
 #   ./scripts/rotate-app-secrets.sh scripts/secrets-dev.txt dev
+#   ./scripts/rotate-app-secrets.sh scripts/secrets-dev.txt dev --skip-missing
 #   ./scripts/rotate-app-secrets.sh scripts/secrets-prod.txt prod
-#   ./scripts/rotate-app-secrets.sh scripts/secrets-dev.txt dev --test "ACCOUNT_API_KEY, CAMD_SERVICES_SECRET_TOKEN"
-#   ./scripts/rotate-app-secrets.sh scripts/secrets-dev.txt dev --skip-gh-secrets --test "ACCOUNT_API_SECRET_TOKEN, CAMD_SERVICES_SECRET_TOKEN"
 #   ./scripts/rotate-app-secrets.sh scripts/secrets-dev.txt dev --skip-gh-secrets
 #
 # ============================================
@@ -68,16 +66,14 @@ usage() {
   echo "  <cf-space>      Cloud Foundry space (dev, test, perf, beta, staging, prod)"
   echo ""
   echo "Options:"
-  echo "  --test <vars>   Only rotate the specified comma-separated secrets.txt variables."
-  echo "                  Spaces around commas are allowed."
-  echo "                  Example: --test \"ACCOUNT_API_KEY, AUTH_API_SECRET_TOKEN\""
   echo "  --skip-gh-secrets  Skip updating GitHub secrets (non-prod environments only)."
+  echo "  --skip-missing     Skip variables not found in the secrets file instead of failing."
   echo ""
   echo "Examples:"
   echo "  $0 devops/scripts/secrets-dev.txt dev"
   echo "  $0 devops/scripts/secrets-prod.txt prod"
-  echo "  $0 devops/scripts/secrets-dev.txt dev --test ACCOUNT_API_KEY,AUTH_API_SECRET_TOKEN"
   echo "  $0 devops/scripts/secrets-dev.txt dev --skip-gh-secrets"
+  echo "  $0 devops/scripts/secrets-dev.txt dev --skip-missing"
   exit 1
 }
 
@@ -87,23 +83,17 @@ usage() {
 
 SECRETS_FILE=""
 CF_SPACE=""
-TEST_MODE=false
-TEST_VARS=""
 SKIP_GH_SECRETS=false
+SKIP_MISSING=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --test)
-      TEST_MODE=true
-      if [ -z "$2" ] || [[ "$2" == --* ]]; then
-        err "--test requires a comma-separated list of variable names."
-        exit 1
-      fi
-      TEST_VARS="$2"
-      shift 2
-      ;;
     --skip-gh-secrets)
       SKIP_GH_SECRETS=true
+      shift
+      ;;
+    --skip-missing)
+      SKIP_MISSING=true
       shift
       ;;
     --help|-h)
@@ -226,6 +216,7 @@ parse_shared_gh_secrets() {
   local in_section=false
 
   while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
     if [[ "$line" == *"[ROTATE-SCRIPT:GITHUB_SECRETS_START]"* ]]; then
       in_section=true
       continue
@@ -251,27 +242,33 @@ build_gh_secret_map() {
   GH_SECRET_MAP=()
 
   for entry in "${APP_REPO_MAP[@]}"; do
-    local app_name="${entry%%:*}"
     local repo_name="${entry#*:}"
     local script_path="$EASEY_APPS_LOCAL_REPO_ROOT/$repo_name/scripts/environment-variables-secrets.sh"
 
     [ ! -f "$script_path" ] && continue
 
-    # Extract all secrets.txt variable names from the environment-variables-secrets.sh
+    local line=""
+    local mapping=""
+    local source_var=""
+    local gh_secret=""
+
     while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
       [[ -z "$line" ]] && continue
       [[ "$line" =~ ^[[:space:]]*# ]] && continue
+      [[ "$line" =~ ^[[:space:]]*#!/bin/bash[[:space:]]*$ ]] && continue
 
-      local secrets_txt_var
-      if ! secrets_txt_var="$(extract_source_secret_var "$line")"; then
-        continue
+      if ! mapping="$(parse_setenv_mapping_line "$line")"; then
+        err "Unsupported line found while building GitHub secret map in $repo_name: $line"
+        exit 1
       fi
 
-      local gh_secret
-      if gh_secret="$(resolve_gh_secret_name "$repo_name" "$secrets_txt_var")"; then
-        GH_SECRET_MAP+=("$repo_name:$gh_secret:$secrets_txt_var")
+      source_var="${mapping#*|}"
+
+      if gh_secret="$(resolve_gh_secret_name "$repo_name" "$source_var")"; then
+        GH_SECRET_MAP+=("$repo_name:$gh_secret:$source_var")
       else
-        warn "No GitHub secret mapping found for '$secrets_txt_var' in $repo_name workflows. Skipping GH update for this variable."
+        warn "No GitHub secret mapping found for '$source_var' in $repo_name workflows. Skipping GH update for this variable."
       fi
     done < "$script_path"
   done
@@ -280,23 +277,6 @@ build_gh_secret_map() {
 # ============================================
 # Helper functions
 # ============================================
-
-should_process_secret_var() {
-  local candidate="$1"
-
-  if [ "$TEST_MODE" != "true" ]; then
-    return 0
-  fi
-
-  local var
-  for var in "${TEST_VAR_ARRAY[@]}"; do
-    if [ "$candidate" = "$var" ]; then
-      return 0
-    fi
-  done
-
-  return 1
-}
 
 get_app_name_for_repo() {
   local repo="$1"
@@ -319,108 +299,77 @@ join_by_comma() {
   echo "$*"
 }
 
-normalize_source_var_token() {
-  local token="$1"
-
-  token="${token%\"}"
-  token="${token#\"}"
-  token="${token%\'}"
-  token="${token#\'}"
-
-  if [[ "$token" =~ ^\$\{([A-Za-z_][A-Za-z0-9_]*)\}$ ]]; then
-    echo "${BASH_REMATCH[1]}"
-    return 0
-  fi
-
-  if [[ "$token" =~ ^\$([A-Za-z_][A-Za-z0-9_]*)$ ]]; then
-    echo "${BASH_REMATCH[1]}"
-    return 0
-  fi
-
-  return 1
-}
-
-extract_source_secret_var() {
+# Parses a single allowed line shape from environment-variables-secrets.sh
+# Allowed shapes:
+#   cf set-env $APP_NAME TARGET_ENV_VAR $SOURCE_SECRET_VAR
+#   cf set-env "$APP_NAME" TARGET_ENV_VAR "$SOURCE_SECRET_VAR"
+#   command cf set-env $APP_NAME TARGET_ENV_VAR $SOURCE_SECRET_VAR
+#
+# Output format:
+#   TARGET_ENV_VAR|SOURCE_SECRET_VAR
+parse_setenv_mapping_line() {
   local line="$1"
-  local value_token=""
 
-  # Supported/standardized command shapes:
-  #   cf set-env $APP_NAME SOME_ENV_VAR $SECRET_VAR
-  #   cf set-env "$APP_NAME" SOME_ENV_VAR "$SECRET_VAR"
-  #   cf set-env $APP_NAME SOME_ENV_VAR ${SECRET_VAR}
-  #   command cf set-env $APP_NAME SOME_ENV_VAR $SECRET_VAR
-  #   ... with optional trailing inline comment
-  if [[ "$line" =~ ^[[:space:]]*(command[[:space:]]+)?cf[[:space:]]+set-env[[:space:]]+(\$APP_NAME|\"\$APP_NAME\"|\'\$APP_NAME\')[[:space:]]+([A-Za-z0-9_]+|\"[^\"]+\"|\'[^\']+\')[[:space:]]+(\$\{[A-Za-z_][A-Za-z0-9_]*\}|\$[A-Za-z_][A-Za-z0-9_]*|\"\$\{[A-Za-z_][A-Za-z0-9_]*\}\"|\"\$[A-Za-z_][A-Za-z0-9_]*\"|\'\$\{[A-Za-z_][A-Za-z0-9_]*\}\'|\'\$[A-Za-z_][A-Za-z0-9_]*\')[[:space:]]*([#].*)?$ ]]; then
-    value_token="${BASH_REMATCH[4]}"
-    normalize_source_var_token "$value_token"
-    return $?
+  if [[ "$line" =~ ^[[:space:]]*(command[[:space:]]+)?cf[[:space:]]+set-env[[:space:]]+(\$APP_NAME|\"\$APP_NAME\"|\'\$APP_NAME\')[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]+(\$[A-Za-z_][A-Za-z0-9_]*|\"\$[A-Za-z_][A-Za-z0-9_]*\"|\'\$[A-Za-z_][A-Za-z0-9_]*\')[[:space:]]*$ ]]; then
+    local target_env_var="${BASH_REMATCH[3]}"
+    local source_token="${BASH_REMATCH[4]}"
+
+    source_token="${source_token%\"}"
+    source_token="${source_token#\"}"
+    source_token="${source_token%\'}"
+    source_token="${source_token#\'}"
+    source_token="${source_token#\$}"
+
+    echo "${target_env_var}|${source_token}"
+    return 0
   fi
 
   return 1
 }
 
-run_test_mode_setenv_for_app() {
-  local app_name="$1"
+# Validates that a repo's environment-variables-secrets.sh only contains:
+#   - blank lines
+#   - comments
+#   - shebang
+#   - supported cf set-env lines
+validate_env_script_format() {
+  local repo_name="$1"
   local script_path="$2"
-  local matched_count=0
-  local applied_count=0
-  local failed_count=0
   local line=""
+  local line_no=0
+  local mapping=""
+  local target_env_var=""
   local source_var=""
-  local masked=""
-
-  TEST_LAST_MATCHED_VARS=()
-  TEST_LAST_APPLIED_VARS=()
-  TEST_LAST_FAILED_VARS=()
+  local seen_targets=()
 
   while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    line_no=$((line_no + 1))
+
     [[ -z "$line" ]] && continue
     [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" =~ ^[[:space:]]*#!/bin/bash[[:space:]]*$ ]] && continue
 
-    source_var=""
-    if ! source_var="$(extract_source_secret_var "$line")"; then
-      continue
+    if ! mapping="$(parse_setenv_mapping_line "$line")"; then
+      err "Invalid line format in $repo_name ($script_path:$line_no): $line"
+      err "Expected: cf set-env \$APP_NAME TARGET_ENV_VAR \$SOURCE_SECRET_VAR"
+      return 1
     fi
 
-    if ! should_process_secret_var "$source_var"; then
-      continue
+    target_env_var="${mapping%%|*}"
+    source_var="${mapping#*|}"
+
+    if [[ " ${seen_targets[*]} " == *" ${target_env_var} "* ]]; then
+      err "Duplicate target env var '$target_env_var' in $repo_name ($script_path:$line_no)."
+      return 1
     fi
+    seen_targets+=("$target_env_var")
 
-    if [ -z "${!source_var+x}" ] || [ -z "${!source_var}" ]; then
-      err "Required secret '$source_var' for app '$app_name' is missing or empty."
-      exit 1
-    fi
-
-    matched_count=$((matched_count + 1))
-    TEST_LAST_MATCHED_VARS+=("$source_var")
-
-    masked=$(echo "$line" | sed 's/\$[A-Za-z_][A-Za-z_0-9]*/****/g; s/\${[A-Za-z_][A-Za-z_0-9]*}/****/g')
-    info "[$app_name] $masked"
-
-    if (
-      export APP_NAME="$app_name"
-      eval "$line"
-    ); then
-      applied_count=$((applied_count + 1))
-      TEST_LAST_APPLIED_VARS+=("$source_var")
-    else
-      failed_count=$((failed_count + 1))
-      TEST_LAST_FAILED_VARS+=("$source_var")
-      break
+    if [[ -z "$source_var" ]]; then
+      err "Missing source variable in $repo_name ($script_path:$line_no)."
+      return 1
     fi
   done < "$script_path"
-
-  if [ "$matched_count" -eq 0 ]; then
-    return 2
-  fi
-
-  if [ "$applied_count" -gt 0 ] && [ "$failed_count" -gt 0 ]; then
-    return 3
-  fi
-
-  if [ "$failed_count" -gt 0 ]; then
-    return 1
-  fi
 
   return 0
 }
@@ -431,11 +380,11 @@ print_grouped_github_secret_summary() {
   local details=("$@")
 
   if [ ${#details[@]} -eq 0 ]; then
-    $logger "0"
+    info "0"
     return
   fi
 
-  $logger "${#details[@]}"
+  info "${#details[@]}"
 
   local entry
   for entry in "${VALID_APPS[@]}"; do
@@ -499,16 +448,9 @@ info "Secrets file:       $SECRETS_FILE"
 info "CF space:           $CF_SPACE"
 info "GitHub environment: $GH_ENV"
 info "Skip GitHub:        $SKIP_GH_SECRETS"
+info "Skip missing:       $SKIP_MISSING"
 info "Repo root:          $EASEY_APPS_LOCAL_REPO_ROOT"
-if [ "$TEST_MODE" = true ]; then
-  info "Mode:               Test with Selected Secrets (only the following will be updated in '$CF_SPACE'):"
-  IFS=',' read -ra PREVIEW_VARS <<< "$TEST_VARS"
-  for v in "${PREVIEW_VARS[@]}"; do
-    info "                      $(echo "$v" | xargs)"
-  done
-else
-  info "Mode:               FULL (all secrets will be updated in '$CF_SPACE')"
-fi
+info "Mode:               All secrets in the secrets file will be updated in '$CF_SPACE'"
 
 # ============================================
 # Load secrets
@@ -517,40 +459,6 @@ fi
 log "Loading secrets..."
 source "$SECRETS_FILE"
 info "Secrets loaded."
-
-# ============================================
-# Validate test variables (if --test)
-# ============================================
-
-TEST_VAR_ARRAY=()
-
-if [ "$TEST_MODE" = true ]; then
-  log "Validating test variables..."
-
-  IFS=',' read -ra RAW_VARS <<< "$TEST_VARS"
-  for raw in "${RAW_VARS[@]}"; do
-    trimmed=$(echo "$raw" | xargs)
-    [ -z "$trimmed" ] && continue
-    TEST_VAR_ARRAY+=("$trimmed")
-  done
-
-  if [ ${#TEST_VAR_ARRAY[@]} -eq 0 ]; then
-    err "No valid variable names provided to --test."
-    exit 1
-  fi
-
-  for var in "${TEST_VAR_ARRAY[@]}"; do
-    if [ -z "${!var+x}" ]; then
-      err "Variable '$var' not found in secrets file: $SECRETS_FILE"
-      exit 1
-    fi
-    if [ -z "${!var}" ]; then
-      err "Variable '$var' is empty in secrets file: $SECRETS_FILE"
-      exit 1
-    fi
-    info "$var [OK]"
-  done
-fi
 
 # ============================================
 # Validate local repos and scripts
@@ -582,6 +490,10 @@ for entry in "${APP_REPO_MAP[@]}"; do
 
   if [ ! -r "$script_path" ]; then
     err "Script is not readable: $script_path"
+    exit 1
+  fi
+
+  if ! validate_env_script_format "$repo_name" "$script_path"; then
     exit 1
   fi
 
@@ -691,12 +603,12 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
     secrets_var="${rest#*:}"
     app_name="$(get_app_name_for_repo "$repo")"
 
-    if ! should_process_secret_var "$secrets_var"; then
-      continue
-    fi
-
     if [ -z "${!secrets_var+x}" ] || [ -z "${!secrets_var}" ]; then
-      err "Required secret '$secrets_var' for repo '$repo' GitHub secret '$gh_secret' is missing or empty."
+      if [ "$SKIP_MISSING" = true ]; then
+        warn "Skipping GitHub secret '$gh_secret' for $repo ($secrets_var missing or empty)."
+        continue
+      fi
+      err "Required secret '$secrets_var' for repo '$repo' GitHub secret '$gh_secret' is missing or empty. Use --skip-missing to skip."
       exit 1
     fi
 
@@ -719,12 +631,12 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
     log "Updating shared GitHub secrets across all repos..."
 
     for secrets_var in "${GH_SHARED_SECRETS[@]}"; do
-      if ! should_process_secret_var "$secrets_var"; then
-        continue
-      fi
-
       if [ -z "${!secrets_var+x}" ] || [ -z "${!secrets_var}" ]; then
-        err "Shared secret '$secrets_var' is missing or empty in secrets file."
+        if [ "$SKIP_MISSING" = true ]; then
+          warn "Skipping shared GitHub secret '$secrets_var' (missing or empty)."
+          continue
+        fi
+        err "Shared secret '$secrets_var' is missing or empty in secrets file. Use --skip-missing to skip."
         exit 1
       fi
 
@@ -763,67 +675,95 @@ fi
 MODIFIED_APPS=()
 SETENV_SUCCEEDED=()
 SETENV_FAILED=()
-SETENV_SKIPPED=()
-SETENV_PARTIAL=()
-SETENV_PARTIAL_DETAILS=()
-SETENV_FAILED_DETAILS=()
 
-if [ "$TEST_MODE" = true ]; then
-  log "Test mode: applying only specified variables via cf set-env..."
+log "Applying secrets via cf set-env..."
 
-  for entry in "${VALID_APPS[@]}"; do
-    app_name="${entry%%:*}"
-    repo_name="${entry#*:}"
-    script_path="$EASEY_APPS_LOCAL_REPO_ROOT/$repo_name/scripts/environment-variables-secrets.sh"
+for entry in "${VALID_APPS[@]}"; do
+  app_name="${entry%%:*}"
+  repo_name="${entry#*:}"
+  script_path="$EASEY_APPS_LOCAL_REPO_ROOT/$repo_name/scripts/environment-variables-secrets.sh"
 
-    if run_test_mode_setenv_for_app "$app_name" "$script_path"; then
-      MODIFIED_APPS+=("$app_name")
-      SETENV_SUCCEEDED+=("$app_name")
-      info "$app_name set-env completed."
+  present_vars=()
+  missing_vars=()
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    [[ -z "$line" ]] && continue
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" =~ ^[[:space:]]*#!/bin/bash[[:space:]]*$ ]] && continue
+
+    mapping="$(parse_setenv_mapping_line "$line")" || {
+      err "$app_name: invalid line format in $script_path"
+      exit 1
+    }
+
+    source_var="${mapping#*|}"
+
+    if [ -z "${!source_var+x}" ] || [ -z "${!source_var}" ]; then
+      missing_vars+=("$source_var")
     else
-      status=$?
-      if [ "$status" -eq 2 ]; then
-        SETENV_SKIPPED+=("$app_name")
-        info "$app_name had no matching --test variables. Skipping."
-      elif [ "$status" -eq 3 ]; then
-        MODIFIED_APPS+=("$app_name")
-        SETENV_PARTIAL+=("$app_name")
-        SETENV_PARTIAL_DETAILS+=("$app_name:applied($(join_by_comma "${TEST_LAST_APPLIED_VARS[@]}")) failed($(join_by_comma "${TEST_LAST_FAILED_VARS[@]}"))")
-        err "$app_name partially completed during set-env. Applied: $(join_by_comma "${TEST_LAST_APPLIED_VARS[@]}"). Failed: $(join_by_comma "${TEST_LAST_FAILED_VARS[@]}")."
-      else
-        SETENV_FAILED+=("$app_name")
-        if [ ${#TEST_LAST_FAILED_VARS[@]} -gt 0 ]; then
-          SETENV_FAILED_DETAILS+=("$app_name:$(join_by_comma "${TEST_LAST_FAILED_VARS[@]}")")
-          err "$app_name failed during set-env. Failed variables: $(join_by_comma "${TEST_LAST_FAILED_VARS[@]}")."
-        else
-          err "$app_name failed during set-env."
-        fi
-      fi
+      present_vars+=("$source_var")
     fi
-  done
+  done < "$script_path"
 
-else
-  log "Applying all secrets via cf set-env..."
+  if [ ${#present_vars[@]} -eq 0 ]; then
+    if [ "$SKIP_MISSING" = true ]; then
+      warn "Skipping $app_name (no variables present in secrets file)"
+      continue
+    fi
+    err "$app_name has no variables in secrets file: ${missing_vars[*]}. Use --skip-missing to skip."
+    exit 1
+  fi
 
-  for entry in "${VALID_APPS[@]}"; do
-    app_name="${entry%%:*}"
-    repo_name="${entry#*:}"
-    script_path="$EASEY_APPS_LOCAL_REPO_ROOT/$repo_name/scripts/environment-variables-secrets.sh"
+  if [ ${#missing_vars[@]} -gt 0 ] && [ "$SKIP_MISSING" != true ]; then
+    err "$app_name has missing variables: ${missing_vars[*]}. Use --skip-missing to skip."
+    exit 1
+  fi
 
-    log "Setting secrets: $app_name"
-    if (
-      export APP_NAME="$app_name"
-      source "$script_path"
-    ); then
-      MODIFIED_APPS+=("$app_name")
-      SETENV_SUCCEEDED+=("$app_name")
-      info "$app_name set-env completed."
+  if [ ${#missing_vars[@]} -gt 0 ]; then
+    warn "$app_name: skipping missing variables (${missing_vars[*]})"
+  fi
+
+  log "Setting secrets: $app_name"
+  app_failed=false
+  applied_count=0
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    [[ -z "$line" ]] && continue
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ "$line" =~ ^[[:space:]]*#!/bin/bash[[:space:]]*$ ]] && continue
+
+    mapping="$(parse_setenv_mapping_line "$line")" || {
+      err "$app_name: invalid line format in $script_path"
+      app_failed=true
+      break
+    }
+
+    target_env_var="${mapping%%|*}"
+    source_var="${mapping#*|}"
+
+    if [ -z "${!source_var+x}" ] || [ -z "${!source_var}" ]; then
+      continue
+    fi
+
+    if cf set-env "$app_name" "$target_env_var" "${!source_var}"; then
+      applied_count=$((applied_count + 1))
     else
-      SETENV_FAILED+=("$app_name")
-      err "$app_name failed during set-env."
+      err "$app_name: cf set-env failed for target '$target_env_var' from source '$source_var'"
+      app_failed=true
+      break
     fi
-  done
-fi
+  done < "$script_path"
+
+  if [ "$app_failed" = true ]; then
+    SETENV_FAILED+=("$app_name")
+  elif [ "$applied_count" -gt 0 ]; then
+    MODIFIED_APPS+=("$app_name")
+    SETENV_SUCCEEDED+=("$app_name")
+    info "$app_name set-env completed ($applied_count variable(s) applied)."
+  fi
+done
 
 # ============================================
 # Restage apps (one at a time)
@@ -860,24 +800,10 @@ for app in "${SETENV_SUCCEEDED[@]}"; do
   info "  - $app"
 done
 
-info "Set-env partial:   ${#SETENV_PARTIAL[@]}"
-for detail in "${SETENV_PARTIAL_DETAILS[@]}"; do
-  err "  - $detail"
-done
-
-info "Set-env skipped:   ${#SETENV_SKIPPED[@]}"
-for app in "${SETENV_SKIPPED[@]}"; do
-  info "  - $app"
-done
-
 info "Set-env failed:    ${#SETENV_FAILED[@]}"
 for app in "${SETENV_FAILED[@]}"; do
   err "  - $app"
 done
-for detail in "${SETENV_FAILED_DETAILS[@]}"; do
-  err "    details: $detail"
-done
-
 info "Restage succeeded: ${#RESTAGE_SUCCEEDED[@]}"
 for app in "${RESTAGE_SUCCEEDED[@]}"; do
   info "  - $app"
@@ -894,17 +820,13 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
 
   info "GitHub secrets failed by app:"
   print_grouped_github_secret_summary err "${GH_FAILED_DETAILS[@]}"
-elif [ "$SKIP_GH_SECRETS" = true ]; then
-  info "GitHub secrets: skipped (--skip-gh-secrets)"
-else
+elif [ "$CF_SPACE" = "prod" ]; then
   info "GitHub secrets: N/A (prod)"
+else
+  info "GitHub secrets: skipped (--skip-gh-secrets)"
 fi
 
-if [ "$TEST_MODE" = true ]; then
-  info "Test variables: ${TEST_VAR_ARRAY[*]}"
-fi
-
-if [ ${#SETENV_FAILED[@]} -gt 0 ] || [ ${#SETENV_PARTIAL[@]} -gt 0 ] || [ ${#RESTAGE_FAILED[@]} -gt 0 ] || [ "$GH_FAILED" -gt 0 ]; then
+if [ ${#SETENV_FAILED[@]} -gt 0 ] || [ ${#RESTAGE_FAILED[@]} -gt 0 ] || [ "$GH_FAILED" -gt 0 ]; then
   err "Completed with failures."
   exit 1
 fi
