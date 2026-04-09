@@ -1,1 +1,1 @@
-VITE_EASEY v2.0.132 ecmps-ui release/v2.0 
+VITE_EASEY v2.0.133 ecmps-ui release/v2.0
