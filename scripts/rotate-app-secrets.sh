@@ -778,7 +778,7 @@ else
   log "Restaging ${#MODIFIED_APPS[@]} app(s) one at a time..."
   for app in "${MODIFIED_APPS[@]}"; do
     log "Restaging $app..."
-    if cf restage "$app"; then
+    if cf restage "$app" --strategy rolling; then
       RESTAGE_SUCCEEDED+=("$app")
       info "$app restaged successfully."
     else

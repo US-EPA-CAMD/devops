@@ -10,7 +10,6 @@ List=(
   "quartz-scheduler"
   "ssh-tunnel"
   "facilities-api"
-  "mdm-api"
   "account-api"
   "emissions-api"
   "auth-api"
