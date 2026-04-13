@@ -1,13 +1,2 @@
-EASEY v2.0.136 auth-api release/v2.0 
-EASEY v2.0.127 account-api release/v2.0 
-EASEY v2.0.106 mdm-api release/v2.0 
-EASEY v2.0.146 camd-services release/v2.0 
-EASEY v2.0.153 facilities-api release/v2.0 
-EASEY v2.0.167 emissions-api release/v2.0 
-EASEY v2.0.118 monitor-plan-api release/v2.0 
-EASEY v2.0.80 qa-certification-api release/v2.0 
-EASEY v2.0.100 streaming-services release/v2.0 
-EASEY v2.0.128 quartz-scheduler release/v2.0 
-VITE_EASEY v2.0.166 campd-ui release/v2.0 
-VITE_EASEY v2.0.131 ecmps-ui release/v2.0 
+VITE_EASEY v2.0.133 ecmps-ui release/v2.0
 
