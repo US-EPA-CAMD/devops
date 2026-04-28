@@ -17,6 +17,20 @@ set -eo pipefail
 #      (per-environment) so CI/CD deployments stay in sync.
 #   4. Restages all modified apps one at a time.
 #
+# Repository-level vs Environment-level GitHub secrets:
+#   Some secrets (API_KEY, CLIENT_ID, CLIENT_SECRET) are set at the
+#   GitHub repository level, not per-environment. These use the same
+#   value across all non-prod environments and a separate value for prod.
+#   The script detects these automatically and sets them without --env.
+#
+#   Because repo-level secrets are shared across environments, they only
+#   need to be rotated twice:
+#     1. Once for non-prod (any single run against dev, test, etc. updates
+#        the repo-level secret for all non-prod environments).
+#     2. Once for prod (via deploy-all.sh or manual update).
+#
+#   Use the same value for these secrets across all non-prod environments.
+#
 # Prerequisites:
 #   - cf CLI installed and logged in (cf login)
 #   - gh CLI installed and authenticated (non-prod only, unless --skip-gh-secrets)
@@ -189,7 +203,7 @@ resolve_gh_secret_name() {
   # Match pattern: <SECRETS_TXT_VAR>: ${{ secrets.<GH_SECRET_NAME> }}
   # Anchored with leading whitespace to prevent partial variable name matches
   local match
-  match=$(grep -rhE "^[[:space:]]+${secrets_txt_var}:.*secrets\." "$workflows_dir"/*.yml 2>/dev/null | head -1)
+  match=$(grep -rhE --include='*.yml' --include='*.yaml' "^[[:space:]]+${secrets_txt_var}:.*secrets\." "$workflows_dir" 2>/dev/null | head -1)
 
   if [ -z "$match" ]; then
     return 1
@@ -205,35 +219,6 @@ resolve_gh_secret_name() {
 
   echo "$gh_name"
   return 0
-}
-
-# Parses shared GitHub-only secrets from the secrets file.
-# Reads variables between [ROTATE-SCRIPT:GITHUB_SECRETS_START] and
-# [ROTATE-SCRIPT:GITHUB_SECRETS_END] markers.
-# Returns variable names in GH_SHARED_SECRETS array.
-parse_shared_gh_secrets() {
-  GH_SHARED_SECRETS=()
-  local in_section=false
-
-  while IFS= read -r line || [ -n "$line" ]; do
-    line="${line%$'\r'}"
-    if [[ "$line" == *"[ROTATE-SCRIPT:GITHUB_SECRETS_START]"* ]]; then
-      in_section=true
-      continue
-    fi
-    if [[ "$line" == *"[ROTATE-SCRIPT:GITHUB_SECRETS_END]"* ]]; then
-      in_section=false
-      continue
-    fi
-    if [ "$in_section" = true ]; then
-      [[ -z "$line" ]] && continue
-      [[ "$line" =~ ^[[:space:]]*# ]] && continue
-      # Extract variable name from: export VAR_NAME=value
-      if [[ "$line" =~ ^[[:space:]]*export[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)= ]]; then
-        GH_SHARED_SECRETS+=("${BASH_REMATCH[1]}")
-      fi
-    fi
-  done < "$SECRETS_FILE"
 }
 
 # Builds the GH_SECRET_MAP dynamically from workflow files.
@@ -565,9 +550,11 @@ info "${#VALID_APPS[@]} app(s) found."
 # Build GitHub secret mapping (non-prod only)
 # ============================================
 
-GH_SECRET_MAP=()
+# GitHub secrets that are set at the repository level (same value across
+# all non-prod environments) rather than per-environment.
+GH_REPO_LEVEL_SECRETS=("API_KEY")
 
-GH_SHARED_SECRETS=()
+GH_SECRET_MAP=()
 
 if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
   log "Building GitHub secret mapping from workflow files..."
@@ -578,10 +565,6 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
     exit 1
   fi
   info "${#GH_SECRET_MAP[@]} per-app mapping(s) resolved."
-
-  log "Parsing shared GitHub secrets from secrets file..."
-  parse_shared_gh_secrets
-  info "${#GH_SHARED_SECRETS[@]} shared secret(s) found: ${GH_SHARED_SECRETS[*]}"
 fi
 
 # ============================================
@@ -613,9 +596,16 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
     fi
 
     value="${!secrets_var}"
-    info "$app_name -> $gh_secret (from $secrets_var)"
 
-    if printf '%s' "$value" | gh secret set "$gh_secret" --repo "$GH_ORG/$repo" --env "$GH_ENV"; then
+    if [[ " ${GH_REPO_LEVEL_SECRETS[*]} " == *" $gh_secret "* ]]; then
+      info "$app_name -> $gh_secret (from $secrets_var) [repo-level]"
+      gh_set_cmd=(gh secret set "$gh_secret" --repo "$GH_ORG/$repo")
+    else
+      info "$app_name -> $gh_secret (from $secrets_var) [env: $GH_ENV]"
+      gh_set_cmd=(gh secret set "$gh_secret" --repo "$GH_ORG/$repo" --env "$GH_ENV")
+    fi
+
+    if printf '%s' "$value" | "${gh_set_cmd[@]}"; then
       GH_UPDATED=$((GH_UPDATED + 1))
       GH_UPDATED_DETAILS+=("$app_name:$gh_secret")
     else
@@ -625,40 +615,6 @@ if [ "$CF_SPACE" != "prod" ] && [ "$SKIP_GH_SECRETS" = false ]; then
     fi
     unset value
   done
-
-  # --- Shared GitHub secrets (pushed to all repos with same name) ---
-  if [ ${#GH_SHARED_SECRETS[@]} -gt 0 ]; then
-    log "Updating shared GitHub secrets across all repos..."
-
-    for secrets_var in "${GH_SHARED_SECRETS[@]}"; do
-      if [ -z "${!secrets_var+x}" ] || [ -z "${!secrets_var}" ]; then
-        if [ "$SKIP_MISSING" = true ]; then
-          warn "Skipping shared GitHub secret '$secrets_var' (missing or empty)."
-          continue
-        fi
-        err "Shared secret '$secrets_var' is missing or empty in secrets file. Use --skip-missing to skip."
-        exit 1
-      fi
-
-      value="${!secrets_var}"
-
-      for entry in "${APP_REPO_MAP[@]}"; do
-        app_name="${entry%%:*}"
-        repo_name="${entry#*:}"
-
-        info "$app_name -> $secrets_var (shared)"
-        if printf '%s' "$value" | gh secret set "$secrets_var" --repo "$GH_ORG/$repo_name" --env "$GH_ENV"; then
-          GH_UPDATED=$((GH_UPDATED + 1))
-          GH_UPDATED_DETAILS+=("$app_name:$secrets_var")
-        else
-          GH_FAILED=$((GH_FAILED + 1))
-          GH_FAILED_DETAILS+=("$app_name:$secrets_var")
-          err "Failed to update shared GitHub secret '$secrets_var' for app '$app_name' (repo '$repo_name')."
-        fi
-      done
-      unset value
-    done
-  fi
 
   info "$GH_UPDATED GitHub secret(s) updated total."
 
