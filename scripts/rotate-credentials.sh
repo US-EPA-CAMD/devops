@@ -3,14 +3,14 @@ set -eo pipefail
 
 cf target -s $1
 cf update-service camd-pg-db -c '{"rotate_credentials": true}'
-sleep 0.5
+echo "Waiting 2 minutes for rotate credentials to finish... "
+sleep 120
 
 List=(
   "mdm-api"
   "quartz-scheduler"
   "ssh-tunnel"
   "facilities-api"
-  "mdm-api"
   "account-api"
   "emissions-api"
   "auth-api"
@@ -23,9 +23,7 @@ List=(
 for app in ${List[*]}
 do
    echo "Rotating credentials for $app..."
-   ./rotate-credential.sh $app &
-   sleep 0.1
+   ./rotate-credential.sh $app
 done
 
-wait
 echo "All done"

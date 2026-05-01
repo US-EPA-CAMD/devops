@@ -18,7 +18,7 @@ on:
       appurl:
         description: 'The home page URL of the React app (unauthenticated URL)'
         required: true
-        default: 'https://ecmps-perf.app.cloud.gov/'
+        default: 'https://ecmps-perf.app.cloud.gov/ecmps/'
       userID:
         description: 'The user ID for login (optional, defaults to GitHub secret). CDX Bypass must be ON'
         required: false
