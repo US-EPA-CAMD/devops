@@ -1,3 +1,5 @@
 .vscode
 *.session.sql
 scripts/secrets.txt
+secrets/
+secrets*.txt
