@@ -85,7 +85,7 @@ const REPO_CONFIG: { [key: string]: { portEnvVar?: string; portValue?: number; e
   'easey-account-api': { portEnvVar: 'EASEY_ACCOUNT_API_PORT', enabled: true },
   'easey-quartz-scheduler': { portValue: 0, enabled: true },
   'easey-ecmps-ui': { portValue: 3000, enabled: true },
-  'easey-campd-ui': { portEnvVar: 'EASEY_CAMPD_UI_PORT', enabled: false }
+  'easey-campd-ui': { portEnvVar: 'EASEY_CAMPD_UI_PORT', enabled: true }
 };
 
 // Extract the list of enabled repositories
